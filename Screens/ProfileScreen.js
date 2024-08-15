@@ -46,10 +46,7 @@ const ProfileScreen = () => {
           <Text style={styles.userName}>Name of User</Text>
           <Text style={styles.userHandle}>@username</Text>
 
-          <TouchableOpacity
-            onPress={() => navigation.navigate("EditProfile")} // Corrected navigation to EditProfile
-            style={styles.editProfileButton}
-          >
+          <TouchableOpacity style={styles.editProfileButton}>
             <Text style={styles.editProfileText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
