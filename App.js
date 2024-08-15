@@ -2,8 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 
 import Nav, { AuthStack } from "./Navigation";
-import { AuthProvider } from "./AuthContext";
-
+import { AuthProvider } from "./Screens/context/AuthContext";
 export default function App() {
   return (
     <AuthProvider>

@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -44,13 +46,42 @@ const RegisterScreen = ({ navigation }) => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     validateEmail(email);
     validatePhone(phone);
 
     if (!emailError && !phoneError && username && password) {
       setLoading(true);
-      // Simulate API call
+      const user = {
+        name: username,
+        email: email,
+        number: phone,
+        password: password,
+      };
+      try {
+        await axios.post(
+          "https://waste-recycle-app-backend.onrender.com/register",
+          user
+        );
+        Alert.alert(
+          "Registration successful",
+          "You have been registered successfully"
+        );
+        setUsername("");
+        setEmail("");
+        setPhone("");
+        setPassword("");
+        setLoading(false);
+        // navigation.navigate("Home");
+      } catch (error) {
+        setLoading(false);
+        Alert.alert(
+          "Registration failed",
+          "An error occurred during registration"
+        );
+        console.error("Registration error caused wen ", error);
+      }
+
       setTimeout(() => {
         setLoading(false);
         alert("Account created successfully!");

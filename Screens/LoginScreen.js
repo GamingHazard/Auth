@@ -12,7 +12,7 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "./context/AuthContext";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -43,12 +43,9 @@ const LoginScreen = () => {
 
     if (!emailError && email && password) {
       setLoading(true);
-
-      // Simulate API call
+      login(email, password);
       setTimeout(() => {
         setLoading(false);
-        // alert("Login successful!");
-        login(email, password);
       }, 2000);
     }
   };
@@ -90,6 +87,7 @@ const LoginScreen = () => {
             onChangeText={(text) => setEmail(text)}
             onBlur={() => validateEmail(email)}
             autoCapitalize="none"
+            value={email}
           />
         </View>
         {emailError ? <Text style={{ color: "red" }}>{emailError}</Text> : null}
@@ -114,6 +112,7 @@ const LoginScreen = () => {
             placeholder="Password"
             secureTextEntry={!passwordVisible}
             onChangeText={(text) => setPassword(text)}
+            value={password}
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
             <Ionicons

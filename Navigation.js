@@ -11,24 +11,13 @@ import RegisterScreen from "./Screens/RegisterScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import ProfileEditScreen from "./Screens/ProfileEditScreen";
 import WelcomeScreen from "./Screens/WelcomeScreen";
-import { ActivityIndicator, View } from "react-native";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./Screens/context/AuthContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Stack Navigator for the Home Tab
-function HomeStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="EditProfile" component={ProfileEditScreen} />
-    </Stack.Navigator>
-  );
-}
-
 // Stack Navigator for Authentication
-export function AuthStack() {
+function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
@@ -40,16 +29,11 @@ export function AuthStack() {
 
 // Main App Component as a functional component
 export default function Nav() {
-  const { isLoading, userToken } = useContext(AuthContext);
+  const { UserToken } = useContext(AuthContext);
 
-  if (isLoading) {
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size={"large"} color={"black"} />
-    </View>;
-  }
   return (
     <NavigationContainer>
-      {userToken !== null ? (
+      {UserToken !== null ? (
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
@@ -70,7 +54,7 @@ export default function Nav() {
             headerShown: false, // Removes headers from all tab screens
           })}
         >
-          <Tab.Screen name="Home" component={HomeStack} />
+          <Tab.Screen name="Home" component={HomeScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>

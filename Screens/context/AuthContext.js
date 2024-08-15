@@ -6,22 +6,31 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userToken, setUserToken] = useState(null);
+  const [UserToken, setUserToken] = useState(null);
   const [UserInfo, setUserInfo] = useState(null);
 
-  const login = () => {
+  const login = (email, password) => {
     setIsLoading(true);
-    axios.post("http://localhost:3000").then((res) => {
-      let UserInfo = res.data;
-      setUserInfo(UserInfo);
-      setUserToken(UserInfo.data.token);
+    axios
+      .post("https://waste-recycle-app-backend.onrender.com/login", {
+        email,
+        password,
+      })
+      .then((response) => {
+        // console.log(response.data.token);
 
-      AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
-      AsyncStorage.setItem("userToken", UserInfo.data.token);
-    });
+        // setUserToken(response.data.token);
+
+        let UserInfo = response.data;
+        setUserInfo(UserInfo);
+        setUserToken(UserInfo.token);
+
+        AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
+        AsyncStorage.setItem("userToken", UserInfo.token);
+      });
   };
   const logout = () => {
-    setIsLoading(false);
+    setIsLoading(true);
     setUserToken(null);
     AsyncStorage.removeItem("userInfo");
     AsyncStorage.removeItem("userToken");
@@ -37,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       userInfo = JSON.parse(userInfo);
       if (userInfo) {
         setUserToken(userToken);
-        setUserToken(userInfo);
+        setUserInfo(userInfo);
       }
 
       setIsLoading(false);
@@ -50,7 +59,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ login, logout, isLoading, userToken }}>
+    <AuthContext.Provider
+      value={{ login, logout, isLoading, UserToken, UserInfo }}
+    >
       {children}
     </AuthContext.Provider>
   );

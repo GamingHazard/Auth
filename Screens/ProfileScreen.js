@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { AuthContext } from "../AuthContext";
-
+import { AuthContext } from "./context/AuthContext";
 const ProfileScreen = () => {
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
@@ -19,10 +18,7 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()} // Navigation for back button
-        >
+        <TouchableOpacity style={styles.backButton}>
           <EvilIcons name="chevron-left" size={30} color="black" />
         </TouchableOpacity>
 
