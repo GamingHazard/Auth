@@ -8,24 +8,73 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ModalView from "./components/Modal";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import * as ImagePicker from "expo-image-picker";
+
+import AvatarImg from "../assets/profile.jpg";
 
 const ProfileEditScreen = ({ cancel }) => {
-  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [SelectedImage, setSelectedImage] = useState(null);
+
   const ShowModal = () => {
     setModalVisible(true);
   };
+
   const HideModal = () => {
     setModalVisible(false);
+  };
+
+  const uploadImage = async (mode) => {
+    try {
+      let result = {};
+
+      if (mode === "gallery") {
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 1,
+        });
+      } else {
+        await ImagePicker.requestCameraPermissionsAsync();
+        result = await ImagePicker.launchCameraAsync({
+          cameraType: ImagePicker.CameraType.front,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 1,
+        });
+
+        setModalVisible(false);
+      }
+
+      if (!result.canceled) {
+        // Save image URI to state
+        await SaveImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log("Error is caused by: " + error);
+      HideModal();
+    }
+  };
+
+  const SaveImage = async (imageUri) => {
+    setSelectedImage(imageUri);
+    setModalVisible(false);
+  };
+
+  const removeImage = async () => {
+    try {
+      setSelectedImage(null);
+    } catch (error) {
+      console.log("Error is caused by: " + error);
+      setModalVisible(false);
+    }
   };
 
   return (
@@ -38,7 +87,6 @@ const ProfileEditScreen = ({ cancel }) => {
           padding: 10,
           flexDirection: "row",
           alignItems: "center",
-          // backgroundColor: "lightgreen",
         }}
       >
         <View
@@ -46,7 +94,7 @@ const ProfileEditScreen = ({ cancel }) => {
         ></View>
       </View>
       <ScrollView style={{ flex: 1, width: "50%" }}>
-        {/* Profile pic  */}
+        {/* Profile pic */}
         <View
           style={{
             alignItems: "center",
@@ -57,37 +105,53 @@ const ProfileEditScreen = ({ cancel }) => {
             alignSelf: "center",
           }}
         >
-          <Text style={{ fontWeight: "bold", fontSize: 26 }}>
-            Edit {""}Profile
-          </Text>
+          <Text style={{ fontWeight: "bold", fontSize: 26 }}>Edit Profile</Text>
 
           <View
             style={{
-              height: "68%",
-              width: "55%",
+              height: 140,
+              width: 140,
               borderRadius: 70,
               borderWidth: 2,
               borderColor: "#3061e4",
               padding: 4,
               marginVertical: 10,
               alignSelf: "center",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Image
-              source={require("../assets/me.jpg")}
-              style={{ width: "100%", height: "100%", borderRadius: 70 }}
+              source={
+                SelectedImage
+                  ? { uri: SelectedImage }
+                  : require("../assets/profile.jpg")
+              }
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 70,
+                resizeMode: "cover",
+              }}
             />
           </View>
-          <Fontisto
+
+          {/* Camera Icon */}
+          <TouchableOpacity
             onPress={ShowModal}
-            style={{ left: 38, top: -38 }}
-            name="camera"
-            size={25}
-            color="#3061e4"
-          />
+            style={{
+              left: 38,
+              top: -38,
+              backgroundColor: "#f2f5fc",
+              padding: 5,
+              borderRadius: 40,
+            }}
+          >
+            <Fontisto name="camera" size={15} color="#3061e4" />
+          </TouchableOpacity>
         </View>
 
-        {/* Modal  */}
+        {/* Modal */}
         <ModalView
           HideModal={HideModal}
           content={
@@ -114,35 +178,44 @@ const ProfileEditScreen = ({ cancel }) => {
                   alignItems: "center",
                 }}
               >
-                {/* Select image by gallery */}
+                {/* Select image from gallery */}
                 <TouchableOpacity
+                  onPress={() => uploadImage("gallery")}
                   style={{
                     padding: 10,
                     justifyContent: "center",
                     alignItems: "center",
+                    backgroundColor: "#f2f5fc",
+                    borderRadius: 10,
                   }}
                 >
                   <Entypo name="images" size={35} color="#3061e4" />
                   <Text>Gallery</Text>
                 </TouchableOpacity>
-                {/* Select image by gallery */}
+                {/* Select image by camera */}
                 <TouchableOpacity
+                  onPress={() => uploadImage("camera")}
                   style={{
                     padding: 10,
                     justifyContent: "center",
                     alignItems: "center",
+                    backgroundColor: "#f2f5fc",
+                    borderRadius: 10,
                   }}
                 >
                   <AntDesign name="camera" size={35} color="#3061e4" />
                   <Text>Camera</Text>
                 </TouchableOpacity>
 
-                {/* delete image */}
+                {/* Delete image */}
                 <TouchableOpacity
+                  onPress={removeImage}
                   style={{
                     padding: 10,
                     justifyContent: "center",
                     alignItems: "center",
+                    backgroundColor: "#f2f5fc",
+                    borderRadius: 10,
                   }}
                 >
                   <Entypo name="trash" size={35} color="#3061e4" />
@@ -154,7 +227,7 @@ const ProfileEditScreen = ({ cancel }) => {
           modalVisible={modalVisible}
         />
 
-        {/* line */}
+        {/* Line */}
         <View
           style={{
             height: 0.5,
@@ -166,7 +239,7 @@ const ProfileEditScreen = ({ cancel }) => {
           }}
         />
 
-        {/* inputs */}
+        {/* Inputs */}
         <View style={{ width: "100%", height: "auto", padding: 10 }}>
           <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
             Name
@@ -256,20 +329,17 @@ const ProfileEditScreen = ({ cancel }) => {
                 borderRadius: 40,
                 padding: 10,
                 justifyContent: "center",
-                paddingHorizontal: 20,
+                paddingHorizontal: 40,
               }}
             >
               <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 18,
-                  color: "white",
-                }}
+                style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
               >
-                Close
+                Cancel
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => console.log("Profile Updated")}
               style={{
                 alignItems: "center",
                 backgroundColor: "#3061e4",
@@ -278,17 +348,13 @@ const ProfileEditScreen = ({ cancel }) => {
                 borderRadius: 40,
                 padding: 10,
                 justifyContent: "center",
-                paddingHorizontal: 20,
+                paddingHorizontal: 40,
               }}
             >
               <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 18,
-                  color: "white",
-                }}
+                style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
               >
-                Update
+                Save
               </Text>
             </TouchableOpacity>
           </View>
@@ -298,15 +364,12 @@ const ProfileEditScreen = ({ cancel }) => {
   );
 };
 
+export default ProfileEditScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    alignItems: "center",
-    borderRadius: 25,
-    width: "100%",
-    // backgroundColor: "lightgreen",
+    paddingVertical: 30,
   },
 });
-
-export default ProfileEditScreen;
