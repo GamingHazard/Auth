@@ -9,7 +9,6 @@ import ProfileScreen from "./Screens/ProfileScreen";
 import SettingsScreen from "./Screens/Settings";
 import RegisterScreen from "./Screens/RegisterScreen";
 import LoginScreen from "./Screens/LoginScreen";
-import ProfileEditScreen from "./Screens/ProfileEditScreen";
 import WelcomeScreen from "./Screens/WelcomeScreen";
 import { AuthContext } from "./Screens/context/AuthContext";
 

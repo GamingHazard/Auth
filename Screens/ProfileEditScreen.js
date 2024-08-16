@@ -14,7 +14,7 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
-const ProfileEditScreen = () => {
+const ProfileEditScreen = ({ cancel }) => {
   const navigation = useNavigation();
 
   return (
@@ -34,15 +34,16 @@ const ProfileEditScreen = () => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         ></View>
       </View>
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, width: "50%" }}>
         {/* Profile pic  */}
         <View
           style={{
             alignItems: "center",
-            width: "100%",
+            width: "60%",
             height: 230,
             paddingTop: 30,
             justifyContent: "center",
+            alignSelf: "center",
           }}
         >
           <Text style={{ fontWeight: "bold", fontSize: 26 }}>
@@ -51,8 +52,8 @@ const ProfileEditScreen = () => {
 
           <View
             style={{
-              height: "40%",
-              width: "20%",
+              height: "68%",
+              width: "55%",
               borderRadius: 70,
               borderWidth: 2,
               borderColor: "#3061e4",
@@ -62,14 +63,14 @@ const ProfileEditScreen = () => {
             }}
           >
             <Image
-              source={require("../assets/profile.jpg")}
+              source={require("../assets/me.jpg")}
               style={{ width: "100%", height: "100%", borderRadius: 70 }}
             />
           </View>
           <Fontisto
-            style={{ left: 28, top: -30 }}
+            style={{ left: 38, top: -38 }}
             name="camera"
-            size={16}
+            size={25}
             color="#3061e4"
           />
         </View>
@@ -86,29 +87,36 @@ const ProfileEditScreen = () => {
           }}
         />
 
-        <View style={{ width: "100%", height: "auto", padding: 20 }}>
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>Name</Text>
+        {/* inputs */}
+        <View style={{ width: "100%", height: "auto", padding: 10 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
+            Name
+          </Text>
           <View
             style={{
-              width: "100%",
+              width: "80%",
               padding: 10,
               marginBottom: 16,
               borderRadius: 40,
               backgroundColor: "#f2f5fc",
               marginTop: 5,
+              alignSelf: "center",
             }}
           >
             <TextInput style={{ paddingLeft: 10 }} placeholder="@username" />
           </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>Email</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
+            Email
+          </Text>
           <View
             style={{
-              width: "100%",
+              width: "80%",
               padding: 10,
               marginBottom: 16,
               borderRadius: 40,
               backgroundColor: "#f2f5fc",
               marginTop: 5,
+              alignSelf: "center",
             }}
           >
             <TextInput
@@ -116,28 +124,34 @@ const ProfileEditScreen = () => {
               placeholder="email@gmail.com"
             />
           </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>Tel Number</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
+            Tel Number
+          </Text>
           <View
             style={{
-              width: "100%",
+              width: "80%",
               padding: 10,
               marginBottom: 16,
               borderRadius: 40,
               backgroundColor: "#f2f5fc",
               marginTop: 5,
+              alignSelf: "center",
             }}
           >
             <TextInput style={{ paddingLeft: 10 }} placeholder="(+256)...." />
           </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>Password</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
+            Password
+          </Text>
           <View
             style={{
-              width: "100%",
+              width: "80%",
               padding: 10,
               marginBottom: 16,
               borderRadius: 40,
               backgroundColor: "#f2f5fc",
               marginTop: 5,
+              alignSelf: "center",
             }}
           >
             <TextInput style={{ paddingLeft: 10 }} placeholder="password..." />
@@ -149,10 +163,12 @@ const ProfileEditScreen = () => {
               justifyContent: "space-evenly",
               marginVertical: 10,
               padding: 10,
+              width: "60%",
+              alignSelf: "center",
             }}
           >
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={cancel}
               style={{
                 alignItems: "center",
                 backgroundColor: "#3061e4",
@@ -171,7 +187,7 @@ const ProfileEditScreen = () => {
                   color: "white",
                 }}
               >
-                Cancel
+                Close
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -208,6 +224,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     alignItems: "center",
+    borderRadius: 25,
+    width: "100%",
+    // backgroundColor: "lightgreen",
   },
 });
 

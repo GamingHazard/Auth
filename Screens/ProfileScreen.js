@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   Text,
   StyleSheet,
@@ -10,10 +10,20 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { AuthContext } from "./context/AuthContext";
+import { Modal, ModalContent } from "react-native-modals";
+import ModalView from "./components/Modal";
+
 const ProfileScreen = () => {
   const { logout } = useContext(AuthContext);
-  const navigation = useNavigation();
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const ShowModal = () => {
+    setModalVisible(true);
+  };
+  const HideModal = () => {
+    setModalVisible(false);
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -35,18 +45,14 @@ const ProfileScreen = () => {
               style={styles.profilePic}
             />
           </View>
-          {/* Uncomment if needed
-          <Fontisto
-            style={{ left: 40, top: -39 }}
-            name="camera"
-            size={20}
-            color="#3061e4"
-          /> */}
 
           <Text style={styles.userName}>Name of User</Text>
           <Text style={styles.userHandle}>@username</Text>
 
-          <TouchableOpacity style={styles.editProfileButton}>
+          <TouchableOpacity
+            onPress={ShowModal} // Use the toggle function
+            style={styles.editProfileButton}
+          >
             <Text style={styles.editProfileText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
@@ -61,6 +67,9 @@ const ProfileScreen = () => {
             <Text style={styles.logoutText}>Log out</Text>
           </View>
         </TouchableOpacity>
+
+        {/* Modal View */}
+        <ModalView HideModal={HideModal} modalVisible={modalVisible} />
       </ScrollView>
     </View>
   );
@@ -161,6 +170,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 30,
     color: "whitesmoke",
+  },
+  modalContent: {
+    width: 500,
+    height: 300,
+    backgroundColor: "lightgreen",
   },
 });
 

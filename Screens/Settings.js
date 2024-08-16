@@ -1,16 +1,21 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Text, StyleSheet, View } from "react-native";
 
-export default class SettingsScreen extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text> textInComponent </Text>
-      </View>
-    );
-  }
-}
+const SettingsScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text> Settings Screen </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "whitesmoke" },
+  container: {
+    flex: 1,
+    backgroundColor: "whitesmoke",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
+
+export default SettingsScreen;
