@@ -315,7 +315,7 @@ const ProfileEditScreen = ({ cancel }) => {
               justifyContent: "space-evenly",
               marginVertical: 10,
               padding: 10,
-              width: "60%",
+              width: "100%",
               alignSelf: "center",
             }}
           >
@@ -354,7 +354,7 @@ const ProfileEditScreen = ({ cancel }) => {
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
               >
-                Save
+                Update
               </Text>
             </TouchableOpacity>
           </View>
