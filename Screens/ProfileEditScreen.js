@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Text,
   StyleSheet,
@@ -13,9 +13,20 @@ import { useNavigation } from "@react-navigation/native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import ModalView from "./components/Modal";
+import Entypo from "@expo/vector-icons/Entypo";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const ProfileEditScreen = ({ cancel }) => {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const ShowModal = () => {
+    setModalVisible(true);
+  };
+  const HideModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -68,12 +79,80 @@ const ProfileEditScreen = ({ cancel }) => {
             />
           </View>
           <Fontisto
+            onPress={ShowModal}
             style={{ left: 38, top: -38 }}
             name="camera"
             size={25}
             color="#3061e4"
           />
         </View>
+
+        {/* Modal  */}
+        <ModalView
+          HideModal={HideModal}
+          content={
+            <View
+              style={{
+                width: 280,
+                height: "auto",
+                backgroundColor: "white",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <FontAwesome
+                onPress={HideModal}
+                style={{ alignSelf: "flex-end" }}
+                name="times-circle-o"
+                size={24}
+                color="black"
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                {/* Select image by gallery */}
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Entypo name="images" size={35} color="#3061e4" />
+                  <Text>Gallery</Text>
+                </TouchableOpacity>
+                {/* Select image by gallery */}
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <AntDesign name="camera" size={35} color="#3061e4" />
+                  <Text>Camera</Text>
+                </TouchableOpacity>
+
+                {/* delete image */}
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Entypo name="trash" size={35} color="#3061e4" />
+                  <Text>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+          modalVisible={modalVisible}
+        />
 
         {/* line */}
         <View

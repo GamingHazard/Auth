@@ -12,6 +12,7 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { AuthContext } from "./context/AuthContext";
 import { Modal, ModalContent } from "react-native-modals";
 import ModalView from "./components/Modal";
+import ProfileEditScreen from "./ProfileEditScreen";
 
 const ProfileScreen = () => {
   const { logout } = useContext(AuthContext);
@@ -69,7 +70,11 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         {/* Modal View */}
-        <ModalView HideModal={HideModal} modalVisible={modalVisible} />
+        <ModalView
+          HideModal={HideModal}
+          content={<ProfileEditScreen cancel={HideModal} />}
+          modalVisible={modalVisible}
+        />
       </ScrollView>
     </View>
   );

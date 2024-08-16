@@ -10,22 +10,12 @@ import {
 } from "react-native";
 import ProfileEditScreen from "../ProfileEditScreen";
 
-const ModalView = ({ modalVisible, HideModal }) => {
+const ModalView = ({ modalVisible, HideModal, content }) => {
   return (
     <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
-        }}
-      >
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalBackground}>
-          <View style={styles.modalView}>
-            <ProfileEditScreen cancel={HideModal} />
-          </View>
+          <View style={styles.modalView}>{content}</View>
         </View>
       </Modal>
     </View>
