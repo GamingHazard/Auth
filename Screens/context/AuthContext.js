@@ -10,7 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [UserToken, setUserToken] = useState(null);
   const [UserInfo, setUserInfo] = useState(null);
   const [SelectedImage, setSelectedImage] = useState(null);
-  // const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [MainModal, setMainModal] = useState(false);
 
   // Register new user
   const register = (username, email, phone, password) => {
@@ -89,13 +90,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // toggel image selection modal
-  // const ShowModal = () => {
-  //   setModalVisible(true);
-  // };
+  const ShowModal = () => {
+    setModalVisible(true);
+  };
 
-  // const HideModal = () => {
-  //   setModalVisible(false);
-  // };
+  const HideModal = () => {
+    setModalVisible(false);
+  };
+
+  // toggle main Edit Page modal
+
+  const ShowEditPage = () => {
+    setMainModal(true);
+  };
+  const HideEditPage = async () => {
+    // setSelectedImage(null);
+    await AsyncStorage.removeItem("userImage");
+    setMainModal(false);
+  };
 
   // function for uploading image
   const uploadImage = async (mode) => {
@@ -143,7 +155,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setSelectedImage(imageUri);
       await AsyncStorage.setItem("userImage", imageUri);
-      // setModalVisible(false);
+      setModalVisible(false);
     } catch (error) {
       console.log("Error saving image: " + error);
     }
@@ -154,6 +166,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setSelectedImage(null);
       await AsyncStorage.removeItem("userImage");
+      setModalVisible(false);
     } catch (error) {
       console.log("Error removing image: " + error);
     }
@@ -171,6 +184,12 @@ export const AuthProvider = ({ children }) => {
         uploadImage,
         removeImage,
         SelectedImage,
+        ShowModal,
+        HideModal,
+        modalVisible,
+        ShowEditPage,
+        HideEditPage,
+        MainModal,
       }}
     >
       {children}

@@ -19,17 +19,14 @@ import AvatarImg from "../assets/profile.jpg";
 import { AuthContext } from "./context/AuthContext";
 
 const ProfileEditScreen = ({ cancel }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const { uploadImage, removeImage, SelectedImage } = useContext(AuthContext);
-
-  const ShowModal = () => {
-    setModalVisible(true);
-  };
-
-  const HideModal = () => {
-    setModalVisible(false);
-  };
+  const {
+    uploadImage,
+    removeImage,
+    SelectedImage,
+    ShowModal,
+    HideModal,
+    modalVisible,
+  } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>

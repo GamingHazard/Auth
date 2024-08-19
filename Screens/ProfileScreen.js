@@ -7,24 +7,22 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { AuthContext } from "./context/AuthContext";
-import { Modal, ModalContent } from "react-native-modals";
 import ModalView from "./components/Modal";
 import ProfileEditScreen from "./ProfileEditScreen";
 
 const ProfileScreen = () => {
-  const { logout } = useContext(AuthContext);
+  const { logout, ShowEditPage, HideEditPage, MainModal, SelectedImage } =
+    useContext(AuthContext);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
 
   const ShowModal = () => {
-    setModalVisible(true);
+    ShowEditPage();
   };
   const HideModal = () => {
-    // cancelImageUpload();
-    setModalVisible(false);
+    HideEditPage();
   };
   return (
     <View style={styles.container}>
@@ -43,8 +41,17 @@ const ProfileScreen = () => {
         <View style={styles.profileContainer}>
           <View style={styles.profilePicContainer}>
             <Image
-              source={require("../assets/profile.jpg")}
-              style={styles.profilePic}
+              source={
+                SelectedImage
+                  ? { uri: SelectedImage }
+                  : require("../assets/profile.jpg")
+              }
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 70,
+                resizeMode: "cover",
+              }}
             />
           </View>
 
@@ -74,7 +81,7 @@ const ProfileScreen = () => {
         <ModalView
           HideModal={HideModal}
           content={<ProfileEditScreen cancel={HideModal} />}
-          modalVisible={modalVisible}
+          modalVisible={MainModal}
         />
       </ScrollView>
     </View>
