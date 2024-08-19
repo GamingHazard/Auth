@@ -23,6 +23,7 @@ const ProfileScreen = () => {
     setModalVisible(true);
   };
   const HideModal = () => {
+    // cancelImageUpload();
     setModalVisible(false);
   };
   return (

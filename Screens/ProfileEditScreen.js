@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Text,
   StyleSheet,
@@ -16,10 +16,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as ImagePicker from "expo-image-picker";
 
 import AvatarImg from "../assets/profile.jpg";
+import { AuthContext } from "./context/AuthContext";
 
 const ProfileEditScreen = ({ cancel }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [SelectedImage, setSelectedImage] = useState(null);
+
+  const { uploadImage, removeImage, SelectedImage } = useContext(AuthContext);
 
   const ShowModal = () => {
     setModalVisible(true);
@@ -27,57 +29,6 @@ const ProfileEditScreen = ({ cancel }) => {
 
   const HideModal = () => {
     setModalVisible(false);
-  };
-
-  const uploadImage = async (mode) => {
-    try {
-      let result = {};
-
-      if (mode === "gallery") {
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-        result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
-        });
-      } else {
-        await ImagePicker.requestCameraPermissionsAsync();
-        result = await ImagePicker.launchCameraAsync({
-          cameraType: ImagePicker.CameraType.front,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
-        });
-
-        setModalVisible(false);
-      }
-
-      if (!result.canceled) {
-        // Save image URI to state
-        await SaveImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log("Error is caused by: " + error);
-      HideModal();
-    }
-  };
-
-  const SaveImage = async (imageUri) => {
-    setSelectedImage(imageUri);
-
-    //upload to backend
-    // sendToBackend();
-    setModalVisible(false);
-  };
-
-  const removeImage = async () => {
-    try {
-      setSelectedImage(null);
-    } catch (error) {
-      console.log("Error is caused by: " + error);
-      setModalVisible(false);
-    }
   };
 
   return (
@@ -154,7 +105,7 @@ const ProfileEditScreen = ({ cancel }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Modal */}
+        {/* Edit Profile Modal */}
         <ModalView
           HideModal={HideModal}
           content={
