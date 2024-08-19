@@ -17,7 +17,7 @@ import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
 
 const RegisterScreen = ({ navigation }) => {
-  const [name, setName] = useState("");
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -53,9 +53,9 @@ const RegisterScreen = ({ navigation }) => {
     validateEmail(email);
     validatePhone(phone);
 
-    if (!emailError && !phoneError && name && password) {
+    if (!emailError && !phoneError && username && password) {
       setLoading(true);
-      register(name, email, password);
+      register(username, email, phone, password);
       setTimeout(() => {
         setLoading(false);
         alert("Account created successfully!");
@@ -80,7 +80,7 @@ const RegisterScreen = ({ navigation }) => {
           Create an account
         </Text>
 
-        {/* name Input */}
+        {/* username Input */}
         <View
           style={{
             width: "100%",
@@ -94,12 +94,12 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <AntDesign name="user" size={24} color="grey" />
+          <AntDesign username="user" size={24} color="grey" />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
-            placeholder="User Name"
-            onChangeText={setName}
-            value={name}
+            placeholder="User userName"
+            onChangeText={setUserName}
+            value={username}
           />
         </View>
 
@@ -115,7 +115,11 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <MaterialCommunityIcons name="email-outline" size={24} color="grey" />
+          <MaterialCommunityIcons
+            username="email-outline"
+            size={24}
+            color="grey"
+          />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="Email address"
@@ -139,14 +143,14 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <Feather name="phone" size={24} color="grey" />
+          <Feather username="phone" size={24} color="grey" />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="Tel number (+256)"
             keyboardType="numeric"
             onChangeText={setPhone}
             onBlur={() => validatePhone(phone)}
-            // value={phone}
+            value={phone}
           />
         </View>
         {phoneError ? <Text style={{ color: "red" }}>{phoneError}</Text> : null}
@@ -165,7 +169,7 @@ const RegisterScreen = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Fontisto name="locked" size={24} color="grey" />
+          <Fontisto username="locked" size={24} color="grey" />
           <TextInput
             style={{ flex: 1, marginLeft: 10, fontSize: 16 }}
             placeholder="Password"
@@ -175,7 +179,7 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
             <Ionicons
-              name={passwordVisible ? "eye-off" : "eye"}
+              username={passwordVisible ? "eye-off" : "eye"}
               size={24}
               color="grey"
             />
@@ -272,7 +276,7 @@ const RegisterScreen = ({ navigation }) => {
           >
             <AntDesign
               style={{ marginRight: 10 }}
-              name="apple1"
+              username="apple1"
               size={24}
               color="black"
             />
@@ -295,7 +299,7 @@ const RegisterScreen = ({ navigation }) => {
           >
             <AntDesign
               style={{ marginRight: 10 }}
-              name="google"
+              username="google"
               size={24}
               color="black"
             />

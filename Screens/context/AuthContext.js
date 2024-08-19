@@ -9,12 +9,13 @@ export const AuthProvider = ({ children }) => {
   const [UserToken, setUserToken] = useState(null);
   const [UserInfo, setUserInfo] = useState(null);
 
-  const register = (name, email, password) => {
+  const register = (username, email, phone, password) => {
     setIsLoading(true);
     axios
       .post("https://demo-backend-85jo.onrender.com/register", {
-        name,
+        username,
         email,
+        phone,
         password,
       })
       .then((response) => {
