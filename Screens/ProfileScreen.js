@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -11,10 +11,17 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { AuthContext } from "./context/AuthContext";
 import ModalView from "./components/Modal";
 import ProfileEditScreen from "./ProfileEditScreen";
+import axios from "axios";
 
 const ProfileScreen = () => {
-  const { logout, ShowEditPage, HideEditPage, MainModal, SelectedImage } =
-    useContext(AuthContext);
+  const {
+    logout,
+    ShowEditPage,
+    HideEditPage,
+    MainModal,
+    SelectedImage,
+    UserInfo,
+  } = useContext(AuthContext);
 
   // const [modalVisible, setModalVisible] = useState(false);
 
@@ -24,13 +31,14 @@ const ProfileScreen = () => {
   const HideModal = () => {
     HideEditPage();
   };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        {/* <TouchableOpacity style={styles.backButton}>
           <EvilIcons name="chevron-left" size={30} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>Profile</Text>
@@ -56,7 +64,9 @@ const ProfileScreen = () => {
           </View>
 
           <Text style={styles.userName}>Name of User</Text>
-          <Text style={styles.userHandle}>@username</Text>
+          <Text style={styles.userHandle}>{UserInfo.username}</Text>
+          <Text style={styles.userHandle}>+256 {UserInfo.phone}</Text>
+          <Text style={styles.userHandle}> {UserInfo.email}</Text>
 
           <TouchableOpacity
             onPress={ShowModal} // Use the toggle function
@@ -77,10 +87,12 @@ const ProfileScreen = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Modal View */}
+        {/* edit Modal View */}
         <ModalView
           HideModal={HideModal}
-          content={<ProfileEditScreen cancel={HideModal} />}
+          content={
+            <ProfileEditScreen SaveProfile={HideModal} cancel={HideModal} />
+          }
           modalVisible={MainModal}
         />
       </ScrollView>

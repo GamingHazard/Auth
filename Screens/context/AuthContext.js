@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
         // setUserToken(response.data.token);
 
         let UserInfo = response.data;
+
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
 
@@ -46,13 +47,15 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((response) => {
-        // console.log(response.data.token);
+        // console.log(response);
 
         // setUserToken(response.data.token);
 
         let UserInfo = response.data;
+
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
+        // console.log(UserInfo.username);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);

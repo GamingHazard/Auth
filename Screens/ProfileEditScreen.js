@@ -18,7 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import AvatarImg from "../assets/profile.jpg";
 import { AuthContext } from "./context/AuthContext";
 
-const ProfileEditScreen = ({ cancel }) => {
+const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   const {
     uploadImage,
     removeImage,
@@ -26,6 +26,7 @@ const ProfileEditScreen = ({ cancel }) => {
     ShowModal,
     HideModal,
     modalVisible,
+    UserInfo,
   } = useContext(AuthContext);
 
   return (
@@ -117,7 +118,7 @@ const ProfileEditScreen = ({ cancel }) => {
             >
               <FontAwesome
                 onPress={HideModal}
-                style={{ alignSelf: "flex-end" }}
+                style={{ alignSelf: "flex-end", marginBottom: 15 }}
                 name="times-circle-o"
                 size={24}
                 color="black"
@@ -206,7 +207,10 @@ const ProfileEditScreen = ({ cancel }) => {
               alignSelf: "center",
             }}
           >
-            <TextInput style={{ paddingLeft: 10 }} placeholder="@username" />
+            <TextInput
+              style={{ paddingLeft: 10 }}
+              placeholder={UserInfo.username}
+            />
           </View>
           <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
             Email
@@ -224,7 +228,7 @@ const ProfileEditScreen = ({ cancel }) => {
           >
             <TextInput
               style={{ paddingLeft: 10 }}
-              placeholder="email@gmail.com"
+              placeholder={UserInfo.email}
             />
           </View>
           <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
@@ -241,7 +245,10 @@ const ProfileEditScreen = ({ cancel }) => {
               alignSelf: "center",
             }}
           >
-            <TextInput style={{ paddingLeft: 10 }} placeholder="(+256)...." />
+            <TextInput
+              style={{ paddingLeft: 10 }}
+              placeholder={`(+256) ${" "} ${UserInfo.phone}`}
+            />
           </View>
           <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
             Password
@@ -250,24 +257,25 @@ const ProfileEditScreen = ({ cancel }) => {
             style={{
               width: "80%",
               padding: 10,
-              marginBottom: 16,
+
               borderRadius: 40,
               backgroundColor: "#f2f5fc",
               marginTop: 5,
               alignSelf: "center",
             }}
           >
-            <TextInput style={{ paddingLeft: 10 }} placeholder="password..." />
+            <TextInput style={{ paddingLeft: 10 }} />
           </View>
 
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-evenly",
-              marginVertical: 10,
+
               padding: 10,
               width: "100%",
               alignSelf: "center",
+              top: -15,
             }}
           >
             <TouchableOpacity
@@ -286,11 +294,11 @@ const ProfileEditScreen = ({ cancel }) => {
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
               >
-                Cancel
+                close
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => console.log("Profile Updated")}
+              onPress={SaveProfile}
               style={{
                 alignItems: "center",
                 backgroundColor: "#3061e4",
