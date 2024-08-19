@@ -9,10 +9,31 @@ export const AuthProvider = ({ children }) => {
   const [UserToken, setUserToken] = useState(null);
   const [UserInfo, setUserInfo] = useState(null);
 
+  const register = (name, email, password) => {
+    setIsLoading(true);
+    axios
+      .post("https://demo-backend-85jo.onrender.com/register", {
+        name,
+        email,
+        password,
+      })
+      .then((response) => {
+        console.log(response);
+
+        // setUserToken(response.data.token);
+
+        let UserInfo = response.data;
+        setUserInfo(UserInfo);
+        setUserToken(UserInfo.token);
+
+        AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
+        AsyncStorage.setItem("userToken", UserInfo.token);
+      });
+  };
   const login = (email, password) => {
     setIsLoading(true);
     axios
-      .post("https://waste-recycle-app-backend.onrender.com/login", {
+      .post("https://demo-backend-85jo.onrender.com/login", {
         email,
         password,
       })
@@ -60,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ login, logout, isLoading, UserToken, UserInfo }}
+      value={{ register, login, logout, isLoading, UserToken, UserInfo }}
     >
       {children}
     </AuthContext.Provider>

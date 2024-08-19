@@ -65,6 +65,9 @@ const ProfileEditScreen = ({ cancel }) => {
 
   const SaveImage = async (imageUri) => {
     setSelectedImage(imageUri);
+
+    //upload to backend
+    // sendToBackend();
     setModalVisible(false);
   };
 

@@ -20,6 +20,7 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "plugins": ["expo-camera"],
     "web": {
       "favicon": "./assets/favicon.png"
     }

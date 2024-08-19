@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Text,
   StyleSheet,
@@ -14,9 +14,10 @@ import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { AuthContext } from "./context/AuthContext";
 
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +25,8 @@ const RegisterScreen = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+
+  const { register } = useContext(AuthContext);
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
@@ -50,38 +53,9 @@ const RegisterScreen = ({ navigation }) => {
     validateEmail(email);
     validatePhone(phone);
 
-    if (!emailError && !phoneError && username && password) {
+    if (!emailError && !phoneError && name && password) {
       setLoading(true);
-      const user = {
-        name: username,
-        email: email,
-        number: phone,
-        password: password,
-      };
-      try {
-        await axios.post(
-          "https://waste-recycle-app-backend.onrender.com/register",
-          user
-        );
-        Alert.alert(
-          "Registration successful",
-          "You have been registered successfully"
-        );
-        setUsername("");
-        setEmail("");
-        setPhone("");
-        setPassword("");
-        setLoading(false);
-        // navigation.navigate("Home");
-      } catch (error) {
-        setLoading(false);
-        Alert.alert(
-          "Registration failed",
-          "An error occurred during registration"
-        );
-        console.error("Registration error caused wen ", error);
-      }
-
+      register(name, email, password);
       setTimeout(() => {
         setLoading(false);
         alert("Account created successfully!");
@@ -106,7 +80,7 @@ const RegisterScreen = ({ navigation }) => {
           Create an account
         </Text>
 
-        {/* Username Input */}
+        {/* name Input */}
         <View
           style={{
             width: "100%",
@@ -124,7 +98,8 @@ const RegisterScreen = ({ navigation }) => {
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="User Name"
-            onChangeText={setUsername}
+            onChangeText={setName}
+            value={name}
           />
         </View>
 
@@ -147,6 +122,7 @@ const RegisterScreen = ({ navigation }) => {
             onChangeText={setEmail}
             onBlur={() => validateEmail(email)}
             autoCapitalize="none"
+            value={email}
           />
         </View>
         {emailError ? <Text style={{ color: "red" }}>{emailError}</Text> : null}
@@ -170,6 +146,7 @@ const RegisterScreen = ({ navigation }) => {
             keyboardType="numeric"
             onChangeText={setPhone}
             onBlur={() => validatePhone(phone)}
+            // value={phone}
           />
         </View>
         {phoneError ? <Text style={{ color: "red" }}>{phoneError}</Text> : null}
@@ -194,6 +171,7 @@ const RegisterScreen = ({ navigation }) => {
             placeholder="Password"
             secureTextEntry={!passwordVisible}
             onChangeText={setPassword}
+            value={password}
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
             <Ionicons
