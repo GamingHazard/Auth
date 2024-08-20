@@ -172,7 +172,7 @@ app.post("/login", async (req, res) => {
 });
 
 // Endpoint to get user profile
-app.get("/profile", async (req, res) => {
+app.get("/profile/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -193,6 +193,11 @@ app.get("/profile", async (req, res) => {
 app.patch("/updateUser", async (req, res) => {
   try {
     const { username, email, phone } = req.body;
+
+    // Ensure that req.user is available and has an _id property
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
 
     // Create a new user object with the updated info
     const newUser = { username, email, phone };

@@ -32,14 +32,14 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   const [email, setEmail] = useState(UserInfo.user.email);
   const [phone, setPhone] = useState(UserInfo.user.phone);
 
-  const updateProfile = () => {
-    try {
-      updateUserProfile(username, email, phone);
-      SaveProfile();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const updateProfile = async () => {
+  //   try {
+  //     await
+  //     SaveProfile();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -147,7 +147,12 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
             <TouchableOpacity onPress={cancel} style={styles.button}>
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={updateProfile} style={styles.button}>
+            <TouchableOpacity
+              onPress={() => {
+                updateUserProfile(username, email, phone);
+              }}
+              style={styles.button}
+            >
               <Text style={styles.buttonText}>Update</Text>
             </TouchableOpacity>
           </View>
@@ -160,9 +165,11 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgreen",
+    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
+    // marginVertical: 20,
+    borderRadius: 15,
   },
   header: {
     width: "100%",
@@ -211,10 +218,10 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   cameraIcon: {
-    left: 38,
-    top: -38,
+    left: 48,
+    top: -48,
     backgroundColor: "#f2f5fc",
-    padding: 5,
+    padding: 8,
     borderRadius: 40,
   },
   modalContent: {

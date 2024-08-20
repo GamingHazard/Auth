@@ -191,31 +191,27 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      if (updateResponse.status === 200) {
-        console.log(
-          "Profile updated successfully:",
-          updateResponse.data.results.updateUser
-        );
+      //  if (updateResponse.status === 200) {
+      //    console.log(
+      //      "Profile updated successfully:",
+      //      updateResponse.data.results.updateUser
+      //    );
 
-        // Fetch the updated user data
-        const fetchResponse = await axios.get(
-          "https://demo-backend-85jo.onrender.com//profile/:userId", // Replace with your actual API URL to fetch user data
-          {
-            headers: {
-              Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
-            },
-          }
-        );
+      //    // Fetch the updated user data
+      //    const fetchResponse = await axios.get(
+      //      `https://demo-backend-85jo.onrender.com/profile/${UserID}`, // Replace with your actual API URL
+      //      {
+      //        headers: {
+      //          Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
+      //        },
+      //      }
+      //    );
 
-        if (fetchResponse.status === 200) {
-          console.log(
-            "Fetched updated user data:",
-            fetchResponse.data.results.user
-          );
-          // Handle the updated user data (e.g., update state or UI)
-          return fetchResponse.data.results.user; // Return the updated user data
-        }
-      }
+      //    if (fetchResponse.status === 200) {
+      //      setUserInfo(fetchResponse.data.user); // Update the user info in state
+      //      console.log("Fetched updated user data:", fetchResponse.data.user);
+      //    }
+      //  }
     } catch (error) {
       console.error(
         "Error updating or fetching profile:",
