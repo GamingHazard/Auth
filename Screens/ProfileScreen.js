@@ -7,11 +7,9 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { AuthContext } from "./context/AuthContext";
 import ModalView from "./components/Modal";
 import ProfileEditScreen from "./ProfileEditScreen";
-import axios from "axios";
 
 const ProfileScreen = () => {
   const {
@@ -64,9 +62,9 @@ const ProfileScreen = () => {
           </View>
 
           <Text style={styles.userName}>Name of User</Text>
-          <Text style={styles.userHandle}>{UserInfo.username}</Text>
-          <Text style={styles.userHandle}>+256 {UserInfo.phone}</Text>
-          <Text style={styles.userHandle}> {UserInfo.email}</Text>
+          <Text style={styles.userHandle}>{UserInfo.user.username}</Text>
+          <Text style={styles.userHandle}>+256 {UserInfo.user.phone}</Text>
+          <Text style={styles.userHandle}> {UserInfo.user.email}</Text>
 
           <TouchableOpacity
             onPress={ShowModal} // Use the toggle function

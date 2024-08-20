@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [SelectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [MainModal, setMainModal] = useState(false);
+  const [UserID, setUserID] = useState(false);
 
   // Register new user
   const register = (username, email, phone, password) => {
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }) => {
 
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
+        setUserID(UserInfo.id);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
@@ -47,15 +49,15 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((response) => {
-        console.log(response);
-
-        // setUserToken(response.data.token);
+        // console.log(response.data.user.id);
 
         let UserInfo = response.data;
 
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
-        // console.log(UserInfo.username);
+        setUserID(UserInfo.user.id);
+
+        console.log(UserInfo.user.id);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
