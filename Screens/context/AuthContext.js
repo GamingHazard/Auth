@@ -181,9 +181,9 @@ export const AuthProvider = ({ children }) => {
   const updateUserProfile = async (username, email, phone) => {
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem("authToken"); // Or however you're storing your token
-      const response = await axios.patch(
-        "https://demo-backend-85jo.onrender.com/updateUser", // Replace with your API endpoint
+      // Update the user profile
+      const updateResponse = await axios.patch(
+        "https://demo-backend-85jo.onrender.com/updateUser",
         { username, email, phone },
         {
           headers: {
@@ -191,7 +191,23 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
-      // Handle response
+
+      // Fetch the updated profile
+      const profileResponse = await axios.get(
+        `https://demo-backend-85jo.onrender.com/profile/${updateResponse.data.user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+            "Cache-Control": "no-cache",
+          },
+        }
+      );
+
+      // Update state with the new profile data
+      setUserInfo(profileResponse.data);
+
+      // Return the updated profile data if needed
+      return profileResponse.data;
     } catch (error) {
       console.log(
         "Error updating or fetching profile:",
@@ -221,6 +237,7 @@ export const AuthProvider = ({ children }) => {
         HideEditPage,
         MainModal,
         updateUserProfile,
+        UserID,
       }}
     >
       {children}

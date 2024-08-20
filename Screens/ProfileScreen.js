@@ -10,6 +10,7 @@ import {
 import { AuthContext } from "./context/AuthContext";
 import ModalView from "./components/Modal";
 import ProfileEditScreen from "./ProfileEditScreen";
+import axios from "axios";
 
 const ProfileScreen = () => {
   const {
@@ -19,14 +20,45 @@ const ProfileScreen = () => {
     MainModal,
     SelectedImage,
     UserInfo,
+    updateUserInfo,
+    UserID,
   } = useContext(AuthContext);
 
-  // const [modalVisible, setModalVisible] = useState(false);
+  const [user, setUser] = useState(UserInfo?.user || {});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch user data
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(
+        `https://demo-backend-85jo.onrender.com/profile/${UserID}`
+      );
+      setUser(response.data.user);
+      updateUserInfo(response.data.user);
+    } catch (err) {
+      setError("Failed to fetch user data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [UserID]);
+
+  const userName = user.name || "Name of User";
+  const userPhone = user.phone ? `+256 ${user.phone}` : "Phone not available";
+  const userEmail = user.email || "Email not available";
 
   const ShowModal = () => {
     ShowEditPage();
   };
-  const HideModal = () => {
+
+  const HideModal = async () => {
+    await fetchUserData();
     HideEditPage();
   };
 
@@ -34,10 +66,6 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* <TouchableOpacity style={styles.backButton}>
-          <EvilIcons name="chevron-left" size={30} color="black" />
-        </TouchableOpacity> */}
-
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
@@ -61,13 +89,12 @@ const ProfileScreen = () => {
             />
           </View>
 
-          <Text style={styles.userName}>Name of User</Text>
-          <Text style={styles.userHandle}>{UserInfo.user.name}</Text>
-          <Text style={styles.userHandle}>+256 {UserInfo.user.phone}</Text>
-          <Text style={styles.userHandle}> {UserInfo.user.email}</Text>
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.userHandle}>{userPhone}</Text>
+          <Text style={styles.userHandle}>{userEmail}</Text>
 
           <TouchableOpacity
-            onPress={ShowModal} // Use the toggle function
+            onPress={ShowModal}
             style={styles.editProfileButton}
           >
             <Text style={styles.editProfileText}>Edit Profile</Text>
@@ -76,16 +103,13 @@ const ProfileScreen = () => {
 
         <View style={styles.divider} />
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={logout} // Example of logout navigation
-        >
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <View style={styles.logoutButtonContent}>
             <Text style={styles.logoutText}>Log out</Text>
           </View>
         </TouchableOpacity>
 
-        {/* edit Modal View */}
+        {/* Edit Modal View */}
         <ModalView
           HideModal={HideModal}
           content={
@@ -111,14 +135,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  backButton: {
-    borderRadius: 24,
-    backgroundColor: "#c9d0e0",
-    height: 30,
-    width: 30,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   headerTitleContainer: {
     flex: 1,
     justifyContent: "center",
@@ -142,11 +158,6 @@ const styles = StyleSheet.create({
     borderColor: "#3061e4",
     padding: 4,
     marginVertical: 10,
-  },
-  profilePic: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 70,
   },
   userName: {
     fontWeight: "bold",
@@ -193,11 +204,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 30,
     color: "whitesmoke",
-  },
-  modalContent: {
-    width: 500,
-    height: 300,
-    backgroundColor: "lightgreen",
   },
 });
 

@@ -38,6 +38,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
     setIsLoading(true);
     try {
       await updateUserProfile(username, email, phone);
+      SaveProfile();
     } catch (error) {
       console.log(error);
     } finally {
