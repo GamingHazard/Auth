@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import ModalView from "./components/Modal";
@@ -31,15 +32,18 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   const [username, setUsername] = useState(UserInfo.user.name);
   const [email, setEmail] = useState(UserInfo.user.email);
   const [phone, setPhone] = useState(UserInfo.user.phone);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // const updateProfile = async () => {
-  //   try {
-  //     await
-  //     SaveProfile();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const handleUpdateProfile = async () => {
+    setIsLoading(true);
+    try {
+      await updateUserProfile(username, email, phone);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -148,12 +152,15 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                updateUserProfile(username, email, phone);
-              }}
+              onPress={handleUpdateProfile}
               style={styles.button}
+              disabled={isLoading} // Disable button while loading
             >
-              <Text style={styles.buttonText}>Update</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#ffffff" /> // Show spinner when loading
+              ) : (
+                <Text style={styles.buttonText}>Update</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

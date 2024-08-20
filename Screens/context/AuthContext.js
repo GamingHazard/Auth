@@ -179,45 +179,26 @@ export const AuthProvider = ({ children }) => {
 
   // updating user profile
   const updateUserProfile = async (username, email, phone) => {
+    setIsLoading(true);
     try {
-      // Send the PATCH request to update the user profile
-      const updateResponse = await axios.patch(
-        "https://demo-backend-85jo.onrender.com/updateUser", // Replace with your actual API URL
-        { username, email, phone }, // Data to be sent in the request body
+      const token = await AsyncStorage.getItem("authToken"); // Or however you're storing your token
+      const response = await axios.patch(
+        "https://demo-backend-85jo.onrender.com/updateUser", // Replace with your API endpoint
+        { username, email, phone },
         {
           headers: {
-            Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
+            Authorization: `Bearer ${UserToken}`,
           },
         }
       );
-
-      //  if (updateResponse.status === 200) {
-      //    console.log(
-      //      "Profile updated successfully:",
-      //      updateResponse.data.results.updateUser
-      //    );
-
-      //    // Fetch the updated user data
-      //    const fetchResponse = await axios.get(
-      //      `https://demo-backend-85jo.onrender.com/profile/${UserID}`, // Replace with your actual API URL
-      //      {
-      //        headers: {
-      //          Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
-      //        },
-      //      }
-      //    );
-
-      //    if (fetchResponse.status === 200) {
-      //      setUserInfo(fetchResponse.data.user); // Update the user info in state
-      //      console.log("Fetched updated user data:", fetchResponse.data.user);
-      //    }
-      //  }
+      // Handle response
     } catch (error) {
-      console.error(
+      console.log(
         "Error updating or fetching profile:",
-        error.response?.data || error.message
+        error.response ? error.response.data : error.message
       );
-      // Handle the error (e.g., display an error message to the user)
+    } finally {
+      setIsLoading(false);
     }
   };
 
