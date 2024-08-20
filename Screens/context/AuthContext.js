@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
-        setUserID(UserInfo.id);
+        setUserID(UserInfo.user.id);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
@@ -177,6 +177,54 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // updating user profile
+  const updateUserProfile = async (username, email, phone) => {
+    try {
+      // Send the PATCH request to update the user profile
+      const updateResponse = await axios.patch(
+        "https://demo-backend-85jo.onrender.com/updateUser", // Replace with your actual API URL
+        { username, email, phone }, // Data to be sent in the request body
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
+          },
+        }
+      );
+
+      if (updateResponse.status === 200) {
+        console.log(
+          "Profile updated successfully:",
+          updateResponse.data.results.updateUser
+        );
+
+        // Fetch the updated user data
+        const fetchResponse = await axios.get(
+          "https://demo-backend-85jo.onrender.com//profile/:userId", // Replace with your actual API URL to fetch user data
+          {
+            headers: {
+              Authorization: `Bearer ${UserToken}`, // Include the token in the Authorization header
+            },
+          }
+        );
+
+        if (fetchResponse.status === 200) {
+          console.log(
+            "Fetched updated user data:",
+            fetchResponse.data.results.user
+          );
+          // Handle the updated user data (e.g., update state or UI)
+          return fetchResponse.data.results.user; // Return the updated user data
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Error updating or fetching profile:",
+        error.response?.data || error.message
+      );
+      // Handle the error (e.g., display an error message to the user)
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -195,6 +243,7 @@ export const AuthProvider = ({ children }) => {
         ShowEditPage,
         HideEditPage,
         MainModal,
+        updateUserProfile,
       }}
     >
       {children}

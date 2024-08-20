@@ -13,9 +13,6 @@ import ModalView from "./components/Modal";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import * as ImagePicker from "expo-image-picker";
-
-import AvatarImg from "../assets/profile.jpg";
 import { AuthContext } from "./context/AuthContext";
 
 const ProfileEditScreen = ({ cancel, SaveProfile }) => {
@@ -27,78 +24,45 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
     HideModal,
     modalVisible,
     UserInfo,
+    updateUserProfile,
   } = useContext(AuthContext);
+
+  // State for form inputs
+  const [username, setUsername] = useState(UserInfo.user.name);
+  const [email, setEmail] = useState(UserInfo.user.email);
+  const [phone, setPhone] = useState(UserInfo.user.phone);
+
+  const updateProfile = () => {
+    try {
+      updateUserProfile(username, email, phone);
+      SaveProfile();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View
-        style={{
-          width: "100%",
-          height: "auto",
-          padding: 10,
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        ></View>
+      <View style={styles.header}>
+        <View style={styles.headerInner}></View>
       </View>
-      <ScrollView style={{ flex: 1, width: "50%" }}>
+      <ScrollView style={styles.scrollView}>
         {/* Profile pic */}
-        <View
-          style={{
-            alignItems: "center",
-            width: "60%",
-            height: 230,
-            paddingTop: 30,
-            justifyContent: "center",
-            alignSelf: "center",
-          }}
-        >
-          <Text style={{ fontWeight: "bold", fontSize: 26 }}>Edit Profile</Text>
-
-          <View
-            style={{
-              height: 140,
-              width: 140,
-              borderRadius: 70,
-              borderWidth: 2,
-              borderColor: "#3061e4",
-              padding: 4,
-              marginVertical: 10,
-              alignSelf: "center",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <View style={styles.profilePicContainer}>
+          <Text style={styles.headerText}>Edit Profile</Text>
+          <View style={styles.profilePicWrapper}>
             <Image
               source={
                 SelectedImage
                   ? { uri: SelectedImage }
                   : require("../assets/profile.jpg")
               }
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: 70,
-                resizeMode: "cover",
-              }}
+              style={styles.profilePic}
             />
           </View>
-
           {/* Camera Icon */}
-          <TouchableOpacity
-            onPress={ShowModal}
-            style={{
-              left: 38,
-              top: -38,
-              backgroundColor: "#f2f5fc",
-              padding: 5,
-              borderRadius: 40,
-            }}
-          >
+          <TouchableOpacity onPress={ShowModal} style={styles.cameraIcon}>
             <Fontisto name="camera" size={15} color="#3061e4" />
           </TouchableOpacity>
         </View>
@@ -107,39 +71,19 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
         <ModalView
           HideModal={HideModal}
           content={
-            <View
-              style={{
-                width: 280,
-                height: "auto",
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
+            <View style={styles.modalContent}>
               <FontAwesome
                 onPress={HideModal}
-                style={{ alignSelf: "flex-end", marginBottom: 15 }}
+                style={styles.modalCloseIcon}
                 name="times-circle-o"
                 size={24}
                 color="black"
               />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignItems: "center",
-                }}
-              >
+              <View style={styles.modalOptions}>
                 {/* Select image from gallery */}
                 <TouchableOpacity
                   onPress={() => uploadImage("gallery")}
-                  style={{
-                    padding: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#f2f5fc",
-                    borderRadius: 10,
-                  }}
+                  style={styles.modalOption}
                 >
                   <Entypo name="images" size={35} color="#3061e4" />
                   <Text>Gallery</Text>
@@ -147,13 +91,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
                 {/* Select image by camera */}
                 <TouchableOpacity
                   onPress={() => uploadImage("camera")}
-                  style={{
-                    padding: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#f2f5fc",
-                    borderRadius: 10,
-                  }}
+                  style={styles.modalOption}
                 >
                   <AntDesign name="camera" size={35} color="#3061e4" />
                   <Text>Camera</Text>
@@ -162,13 +100,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
                 {/* Delete image */}
                 <TouchableOpacity
                   onPress={removeImage}
-                  style={{
-                    padding: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#f2f5fc",
-                    borderRadius: 10,
-                  }}
+                  style={styles.modalOption}
                 >
                   <Entypo name="trash" size={35} color="#3061e4" />
                   <Text>Delete</Text>
@@ -180,141 +112,43 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
         />
 
         {/* Line */}
-        <View
-          style={{
-            height: 0.5,
-            width: 400,
-            borderWidth: 0.5,
-            borderColor: "whitesmoke",
-            left: 20,
-            right: 20,
-          }}
-        />
+        <View style={styles.line} />
 
         {/* Inputs */}
-        <View style={{ width: "100%", height: "auto", padding: 10 }}>
-          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
-            Name
-          </Text>
-          <View
-            style={{
-              width: "80%",
-              padding: 10,
-              marginBottom: 16,
-              borderRadius: 40,
-              backgroundColor: "#f2f5fc",
-              marginTop: 5,
-              alignSelf: "center",
-            }}
-          >
-            <TextInput
-              style={{ paddingLeft: 10 }}
-              placeholder={UserInfo.username}
-            />
-          </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
-            Email
-          </Text>
-          <View
-            style={{
-              width: "80%",
-              padding: 10,
-              marginBottom: 16,
-              borderRadius: 40,
-              backgroundColor: "#f2f5fc",
-              marginTop: 5,
-              alignSelf: "center",
-            }}
-          >
-            <TextInput
-              style={{ paddingLeft: 10 }}
-              placeholder={UserInfo.email}
-            />
-          </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
-            Tel Number
-          </Text>
-          <View
-            style={{
-              width: "80%",
-              padding: 10,
-              marginBottom: 16,
-              borderRadius: 40,
-              backgroundColor: "#f2f5fc",
-              marginTop: 5,
-              alignSelf: "center",
-            }}
-          >
-            <TextInput
-              style={{ paddingLeft: 10 }}
-              placeholder={`(+256) ${" "} ${UserInfo.phone}`}
-            />
-          </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18, left: 40 }}>
-            Password
-          </Text>
-          <View
-            style={{
-              width: "80%",
-              padding: 10,
-
-              borderRadius: 40,
-              backgroundColor: "#f2f5fc",
-              marginTop: 5,
-              alignSelf: "center",
-            }}
-          >
-            <TextInput style={{ paddingLeft: 10 }} />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-
-              padding: 10,
-              width: "100%",
-              alignSelf: "center",
-              top: -15,
-            }}
-          >
-            <TouchableOpacity
-              onPress={cancel}
-              style={{
-                alignItems: "center",
-                backgroundColor: "#3061e4",
-                alignSelf: "center",
-                marginVertical: 30,
-                borderRadius: 40,
-                padding: 10,
-                justifyContent: "center",
-                paddingHorizontal: 40,
-              }}
-            >
-              <Text
-                style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
-              >
-                close
-              </Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your name"
+            value={username}
+            onChangeText={(text) => setUsername(text)}
+          />
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <Text style={styles.label}>Tel Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your phone number"
+            value={phone}
+            onChangeText={(text) => setPhone(text)}
+          />
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry={true}
+            placeholder="Enter your password"
+          />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={cancel} style={styles.button}>
+              <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={SaveProfile}
-              style={{
-                alignItems: "center",
-                backgroundColor: "#3061e4",
-                alignSelf: "center",
-                marginVertical: 30,
-                borderRadius: 40,
-                padding: 10,
-                justifyContent: "center",
-                paddingHorizontal: 40,
-              }}
-            >
-              <Text
-                style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
-              >
-                Update
-              </Text>
+            <TouchableOpacity onPress={updateProfile} style={styles.button}>
+              <Text style={styles.buttonText}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -323,12 +157,140 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   );
 };
 
-export default ProfileEditScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "lightgreen",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header: {
+    width: "100%",
+    height: "auto",
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerInner: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scrollView: {
+    flex: 1,
+    width: "50%",
+  },
+  profilePicContainer: {
+    alignItems: "center",
+    width: "60%",
+    height: 230,
+    paddingTop: 30,
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 26,
+  },
+  profilePicWrapper: {
+    height: 140,
+    width: 140,
+    borderRadius: 70,
+    borderWidth: 2,
+    borderColor: "#3061e4",
+    padding: 4,
+    marginVertical: 10,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profilePic: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 70,
+    resizeMode: "cover",
+  },
+  cameraIcon: {
+    left: 38,
+    top: -38,
+    backgroundColor: "#f2f5fc",
+    padding: 5,
+    borderRadius: 40,
+  },
+  modalContent: {
+    width: 280,
+    height: "auto",
     backgroundColor: "white",
-    paddingVertical: 30,
+    padding: 10,
+    borderRadius: 10,
+  },
+  modalCloseIcon: {
+    alignSelf: "flex-end",
+    marginBottom: 15,
+  },
+  modalOptions: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
+  modalOption: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f2f5fc",
+    borderRadius: 10,
+  },
+  line: {
+    height: 0.5,
+    width: "100%",
+    borderWidth: 0.5,
+    borderColor: "whitesmoke",
+    left: 20,
+    right: 20,
+  },
+  inputContainer: {
+    width: 400,
+    height: "auto",
+    padding: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    fontSize: 18,
+    left: 30,
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    marginBottom: 16,
+    borderRadius: 40,
+    backgroundColor: "#f2f5fc",
+    marginTop: 5,
+    alignSelf: "center",
+    paddingLeft: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    padding: 10,
+    width: "100%",
+    alignSelf: "center",
+    top: -15,
+  },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#3061e4",
+    alignSelf: "center",
+    marginVertical: 30,
+    borderRadius: 40,
+    padding: 10,
+    justifyContent: "center",
+    paddingHorizontal: 40,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });
+
+export default ProfileEditScreen;

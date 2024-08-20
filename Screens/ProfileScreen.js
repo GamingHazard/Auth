@@ -62,7 +62,7 @@ const ProfileScreen = () => {
           </View>
 
           <Text style={styles.userName}>Name of User</Text>
-          <Text style={styles.userHandle}>{UserInfo.user.username}</Text>
+          <Text style={styles.userHandle}>{UserInfo.user.name}</Text>
           <Text style={styles.userHandle}>+256 {UserInfo.user.phone}</Text>
           <Text style={styles.userHandle}> {UserInfo.user.email}</Text>
 
