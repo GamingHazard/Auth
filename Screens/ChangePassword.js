@@ -27,7 +27,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
 
     try {
       const response = await axios.patch(
-        `https://your-backend-url/reset-password/${token}`,
+        `https://demo-backend-85jo.onrender.com/reset-password/${token}`,
         { password }
       );
 

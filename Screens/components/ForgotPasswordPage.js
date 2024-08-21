@@ -32,6 +32,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       if (token) {
         // Navigate to the ResetPasswordScreen with the token
         navigation.navigate("ResetPassword", { token });
+        setIdentifier("");
       } else {
         // Display an error message if token is not received
         Alert.alert(
