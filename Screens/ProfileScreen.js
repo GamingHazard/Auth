@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import {
   Text,
   StyleSheet,
@@ -20,36 +20,14 @@ const ProfileScreen = () => {
     MainModal,
     SelectedImage,
     UserInfo,
-    updateUserInfo,
     UserID,
+    UserToken,
   } = useContext(AuthContext);
 
   const [user, setUser] = useState(UserInfo?.user || {});
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch user data
-  const fetchUserData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axios.get(
-        `https://demo-backend-85jo.onrender.com/profile/${UserID}`
-      );
-      setUser(response.data.user);
-      updateUserInfo(response.data.user);
-    } catch (err) {
-      setError("Failed to fetch user data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, [UserID]);
-
-  const userName = user.name || "Name of User";
+  const userName = user.username || "Name of User";
   const userPhone = user.phone ? `+256 ${user.phone}` : "Phone not available";
   const userEmail = user.email || "Email not available";
 
@@ -58,8 +36,25 @@ const ProfileScreen = () => {
   };
 
   const HideModal = async () => {
-    await fetchUserData();
-    HideEditPage();
+    try {
+      HideEditPage();
+
+      const profileResponse = await axios.get(
+        `https://demo-backend-85jo.onrender.com/profile/${UserID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+            "Cache-Control": "no-cache",
+          },
+        }
+      );
+
+      const updatedUserInfo = profileResponse.data.user;
+      setUser(updatedUserInfo); // Update the user state with the latest data
+    } catch (err) {
+      setError("Failed to fetch updated user data.");
+      console.error(err);
+    }
   };
 
   return (

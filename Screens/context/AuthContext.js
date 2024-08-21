@@ -10,9 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [UserToken, setUserToken] = useState(null);
   const [UserInfo, setUserInfo] = useState(null);
   const [SelectedImage, setSelectedImage] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
   const [MainModal, setMainModal] = useState(false);
-  const [UserID, setUserID] = useState(false);
+  const [UserID, setUserID] = useState(null);
 
   // Register new user
   const register = (username, email, phone, password) => {
@@ -25,10 +24,6 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((response) => {
-        console.log(response);
-
-        // setUserToken(response.data.token);
-
         let UserInfo = response.data;
 
         setUserInfo(UserInfo);
@@ -37,10 +32,13 @@ export const AuthProvider = ({ children }) => {
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
-  // Logging in user
+  // Log in user
   const login = (email, password) => {
     setIsLoading(true);
     axios
@@ -49,28 +47,28 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((response) => {
-        // console.log(response.data.user.id);
-
         let UserInfo = response.data;
 
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
         setUserID(UserInfo.user.id);
 
-        console.log(UserInfo.user.id);
-
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
-  // logout user
+  // Log out user
   const logout = () => {
     setIsLoading(true);
     setUserToken(null);
+    setUserInfo(null);
+    setUserID(null);
     AsyncStorage.removeItem("userInfo");
     AsyncStorage.removeItem("userToken");
-
     setIsLoading(false);
   };
 
@@ -83,38 +81,30 @@ export const AuthProvider = ({ children }) => {
       if (userInfo) {
         setUserToken(userToken);
         setUserInfo(userInfo);
+        setUserID(userInfo.user.id);
       }
-
-      setIsLoading(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   useEffect(() => {
     isLoggedIn();
   }, []);
 
-  // toggel image selection modal
-  const ShowModal = () => {
-    setModalVisible(true);
-  };
-
-  const HideModal = () => {
-    setModalVisible(false);
-  };
-
-  // toggle main Edit Page modal
-
+  // Toggle main Edit Page modal
   const ShowEditPage = () => {
     setMainModal(true);
   };
+
   const HideEditPage = async () => {
-    // setSelectedImage(null);
     await AsyncStorage.removeItem("userImage");
     setMainModal(false);
   };
 
-  // function for uploading image
+  // Function for uploading image
   const uploadImage = async (mode) => {
     try {
       let result = {};
@@ -155,66 +145,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // stoaring image in AsyncStorage
+  // Storing image in AsyncStorage
   const saveImageToStorage = async (imageUri) => {
     try {
       setSelectedImage(imageUri);
       await AsyncStorage.setItem("userImage", imageUri);
-      setModalVisible(false);
     } catch (error) {
       console.log("Error saving image: " + error);
     }
   };
 
-  // deleting the uploaded image
+  // Deleting the uploaded image
   const removeImage = async () => {
     try {
       setSelectedImage(null);
       await AsyncStorage.removeItem("userImage");
-      setModalVisible(false);
     } catch (error) {
       console.log("Error removing image: " + error);
-    }
-  };
-
-  // updating user profile
-  const updateUserProfile = async (username, email, phone) => {
-    setIsLoading(true);
-    try {
-      // Update the user profile
-      const updateResponse = await axios.patch(
-        "https://demo-backend-85jo.onrender.com/updateUser",
-        { username, email, phone },
-        {
-          headers: {
-            Authorization: `Bearer ${UserToken}`,
-          },
-        }
-      );
-
-      // Fetch the updated profile
-      const profileResponse = await axios.get(
-        `https://demo-backend-85jo.onrender.com/profile/${updateResponse.data.user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${UserToken}`,
-            "Cache-Control": "no-cache",
-          },
-        }
-      );
-
-      // Update state with the new profile data
-      setUserInfo(profileResponse.data);
-
-      // Return the updated profile data if needed
-      return profileResponse.data;
-    } catch (error) {
-      console.log(
-        "Error updating or fetching profile:",
-        error.response ? error.response.data : error.message
-      );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -230,13 +177,9 @@ export const AuthProvider = ({ children }) => {
         uploadImage,
         removeImage,
         SelectedImage,
-        ShowModal,
-        HideModal,
-        modalVisible,
         ShowEditPage,
         HideEditPage,
         MainModal,
-        updateUserProfile,
         UserID,
       }}
     >
