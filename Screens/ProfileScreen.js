@@ -22,6 +22,10 @@ const ProfileScreen = () => {
     UserInfo,
     UserID,
     UserToken,
+    deleteUserAccount,
+    ShowDeleteModal,
+    HideDeleteModal,
+    deleteModal,
   } = useContext(AuthContext);
 
   const [user, setUser] = useState(UserInfo?.user || {});
@@ -57,6 +61,12 @@ const ProfileScreen = () => {
     }
   };
 
+  const DeleteModalShow = () => {
+    ShowDeleteModal();
+  };
+  const DeleteModalHide = () => {
+    HideDeleteModal();
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -88,12 +98,28 @@ const ProfileScreen = () => {
           <Text style={styles.userHandle}>{userPhone}</Text>
           <Text style={styles.userHandle}>{userEmail}</Text>
 
-          <TouchableOpacity
-            onPress={ShowModal}
-            style={styles.editProfileButton}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              padding: 10,
+              width: "100%",
+            }}
           >
-            <Text style={styles.editProfileText}>Edit Profile</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={ShowModal}
+              style={styles.editProfileButton}
+            >
+              <Text style={styles.editProfileText}>Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={DeleteModalShow}
+              style={styles.editProfileButton}
+            >
+              <Text style={styles.editProfileText}>Delete Account</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.divider} />
@@ -111,6 +137,81 @@ const ProfileScreen = () => {
             <ProfileEditScreen SaveProfile={HideModal} cancel={HideModal} />
           }
           modalVisible={MainModal}
+        />
+
+        {/* Delete Account Modal */}
+        <ModalView
+          content={
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 10,
+                padding: 13,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "white",
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 18,
+                  alignSelf: "flex-start",
+                  color: "red",
+                }}
+              >
+                Confirm Deletion
+              </Text>
+              <Text
+                style={{
+                  color: "red",
+                  fontSize: 16,
+                }}
+              >
+                Are you sure you want to delete your account? This action cannot
+                be undone.
+              </Text>
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  padding: 10,
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                  marginTop: 20,
+                }}
+              >
+                {/*  cancel Delete button */}
+                <TouchableOpacity
+                  onPress={DeleteModalHide}
+                  style={{
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#3061e4",
+                    borderRadius: 20,
+                    paddingHorizontal: 40,
+                  }}
+                >
+                  <Text style={styles.editProfileText}>Cancel</Text>
+                </TouchableOpacity>
+
+                {/* Delete Button */}
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "red",
+                    borderRadius: 20,
+                  }}
+                >
+                  <Text style={styles.editProfileText}>Delete Account</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+          modalVisible={deleteModal}
         />
       </ScrollView>
     </View>

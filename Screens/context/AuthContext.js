@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { createContext, useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
-
+import { Alert } from "react-native";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [SelectedImage, setSelectedImage] = useState(null);
   const [MainModal, setMainModal] = useState(false);
   const [UserID, setUserID] = useState(null);
+  const [deleteModal, setdeleteModal] = useState(false);
 
   // Register new user
   const register = (username, email, phone, password) => {
@@ -103,6 +104,12 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("userImage");
     setMainModal(false);
   };
+  const ShowDeleteModal = () => {
+    setdeleteModal(true);
+  };
+  const HideDeleteModal = () => {
+    setdeleteModal(false);
+  };
 
   // Function for uploading image
   const uploadImage = async (mode) => {
@@ -165,6 +172,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Deleting user Account
+  const deleteUserAccount = async () => {
+    setIsLoading(true);
+    try {
+      const deleteResponse = await axios.delete(
+        `https://demo-backend-85jo.onrender.com/deleteUser/${UserID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        }
+      );
+
+      // Check if the deletion was successful
+      if (deleteResponse.status === 200) {
+        // Clear AsyncStorage and update state
+        await AsyncStorage.removeItem("userInfo");
+        await AsyncStorage.removeItem("userToken");
+
+        // Log the user out
+        logout();
+      }
+    } catch (error) {
+      console.log(
+        "Error deleting user account:",
+        error.response ? error.response.data : error.message
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -181,6 +220,10 @@ export const AuthProvider = ({ children }) => {
         HideEditPage,
         MainModal,
         UserID,
+        deleteUserAccount,
+        ShowDeleteModal,
+        HideDeleteModal,
+        deleteModal,
       }}
     >
       {children}
