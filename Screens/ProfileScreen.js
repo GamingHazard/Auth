@@ -37,10 +37,6 @@ const ProfileScreen = () => {
   const userPhone = user.phone ? `+256 ${user.phone}` : "Phone not available";
   const userEmail = user.email || "Email not available";
 
-  const ShowModal = () => {
-    ShowEditPage();
-  };
-
   const HideModal = async () => {
     try {
       HideEditPage();

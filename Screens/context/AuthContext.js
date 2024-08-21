@@ -26,11 +26,12 @@ export const AuthProvider = ({ children }) => {
       })
       .then((response) => {
         let UserInfo = response.data;
+        // console.log(response.data);
 
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
         setUserID(UserInfo.user.id);
-        console.log(UserInfo.token);
+        // console.log(UserInfo.token);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
@@ -105,6 +106,8 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("userImage");
     setMainModal(false);
   };
+
+  // delete user profile modal
   const ShowDeleteModal = () => {
     setdeleteModal(true);
   };
@@ -173,6 +176,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserProfile = async (username, email, phone) => {
+    setIsLoading(true);
+    try {
+      // Update the user profile
+      await axios.patch(
+        "https://demo-backend-85jo.onrender.com/updateUser",
+        { username, email, phone },
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.log(
+        "Error updating or fetching profile:",
+        error.response ? error.response.data : error.message
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -189,7 +215,7 @@ export const AuthProvider = ({ children }) => {
         HideEditPage,
         MainModal,
         UserID,
-
+        updateUserProfile,
         ShowDeleteModal,
         HideDeleteModal,
         deleteModal,
