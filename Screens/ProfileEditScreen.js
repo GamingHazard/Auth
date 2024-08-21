@@ -26,7 +26,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   } = useContext(AuthContext);
 
   // State for form inputs
-  const [username, setUsername] = useState(UserInfo.user.name);
+  const [username, setUsername] = useState(UserInfo.user.username);
   const [email, setEmail] = useState(UserInfo.user.email);
   const [phone, setPhone] = useState(UserInfo.user.phone);
   const [isLoading, setIsLoading] = useState(false);
