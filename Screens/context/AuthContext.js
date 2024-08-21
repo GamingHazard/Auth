@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }) => {
 
       setUserInfo(UserInfo);
       setUserToken(UserInfo.token);
+      setUserID(UserInfo.user.id);
 
       await AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
       await AsyncStorage.setItem("userToken", UserInfo.token);
@@ -205,10 +206,21 @@ export const AuthProvider = ({ children }) => {
   const updateUserProfile = async (username, email, phone) => {
     setIsLoading(true);
     try {
+      // Check if UserToken and UserID are available
+      if (!UserToken || !UserID) {
+        throw new Error("UserToken or UserID is missing.");
+      }
+
+      // Prepare the data to be updated
+      const updateData = {};
+      if (username) updateData.username = username;
+      if (email) updateData.email = email;
+      if (phone) updateData.phone = phone;
+
       // Update the user profile
       const updateResponse = await axios.patch(
         "https://demo-backend-85jo.onrender.com/updateUser",
-        { username, email, phone },
+        updateData,
         {
           headers: {
             Authorization: `Bearer ${UserToken}`,
