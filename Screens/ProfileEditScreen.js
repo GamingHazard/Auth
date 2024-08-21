@@ -21,9 +21,6 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
     uploadImage,
     removeImage,
     SelectedImage,
-    ShowModal,
-    HideModal,
-    modalVisible,
     UserInfo,
     updateUserProfile,
   } = useContext(AuthContext);
@@ -33,6 +30,14 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   const [email, setEmail] = useState(UserInfo.user.email);
   const [phone, setPhone] = useState(UserInfo.user.phone);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUploadModal, setimageUploadModal] = useState(false);
+
+  const ShowImageModal = () => {
+    setimageUploadModal(true);
+  };
+  const HideImageModal = () => {
+    setimageUploadModal(false);
+  };
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
@@ -67,18 +72,17 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
             />
           </View>
           {/* Camera Icon */}
-          <TouchableOpacity onPress={ShowModal} style={styles.cameraIcon}>
+          <TouchableOpacity onPress={ShowImageModal} style={styles.cameraIcon}>
             <Fontisto name="camera" size={15} color="#3061e4" />
           </TouchableOpacity>
         </View>
 
         {/* Edit Profile Modal */}
         <ModalView
-          HideModal={HideModal}
           content={
             <View style={styles.modalContent}>
               <FontAwesome
-                onPress={HideModal}
+                onPress={HideImageModal}
                 style={styles.modalCloseIcon}
                 name="times-circle-o"
                 size={24}
@@ -87,7 +91,10 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
               <View style={styles.modalOptions}>
                 {/* Select image from gallery */}
                 <TouchableOpacity
-                  onPress={() => uploadImage("gallery")}
+                  onPress={() => {
+                    uploadImage("gallery");
+                    setimageUploadModal(false);
+                  }}
                   style={styles.modalOption}
                 >
                   <Entypo name="images" size={35} color="#3061e4" />
@@ -95,7 +102,10 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
                 </TouchableOpacity>
                 {/* Select image by camera */}
                 <TouchableOpacity
-                  onPress={() => uploadImage("camera")}
+                  onPress={() => {
+                    uploadImage("camera");
+                    setimageUploadModal(false);
+                  }}
                   style={styles.modalOption}
                 >
                   <AntDesign name="camera" size={35} color="#3061e4" />
@@ -104,7 +114,10 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
 
                 {/* Delete image */}
                 <TouchableOpacity
-                  onPress={removeImage}
+                  onPress={() => {
+                    removeImage();
+                    setimageUploadModal(false);
+                  }}
                   style={styles.modalOption}
                 >
                   <Entypo name="trash" size={35} color="#3061e4" />
@@ -113,7 +126,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
               </View>
             </View>
           }
-          modalVisible={modalVisible}
+          modalVisible={imageUploadModal}
         />
 
         {/* Line */}

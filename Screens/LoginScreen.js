@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
@@ -14,23 +15,23 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "./context/AuthContext";
 
-const LoginScreen = () => {
-  const [email, setEmail] = useState("");
+const LoginScreen = ({ navigation }) => {
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [emailError, setEmailError] = useState("");
+  const [identifierError, setIdentifierError] = useState("");
 
-  const { login } = useContext(AuthContext);
+  const { login, UserToken } = useContext(AuthContext);
 
-  const navigation = useNavigation();
-
-  const validateEmail = (email) => {
+  const validateIdentifier = (identifier) => {
     const emailRegex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
+    const phoneRegex = /^[0-9]{10}$/;
+
+    if (emailRegex.test(identifier) || phoneRegex.test(identifier)) {
+      setIdentifierError("");
     } else {
-      setEmailError("");
+      setIdentifierError("Please enter a valid email address or phone number");
     }
   };
 
@@ -38,80 +39,68 @@ const LoginScreen = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleLogin = () => {
-    validateEmail(email);
+  const handleLogin = async () => {
+    validateIdentifier(identifier);
 
-    if (!emailError && email && password) {
+    if (!identifierError && identifier && password) {
       setLoading(true);
-      login(email, password);
-      setTimeout(() => {
+      try {
+        await login(identifier, password);
+      } catch (error) {
+        Alert.alert(
+          "Login Error",
+          error.response?.data?.message || "An error occurred."
+        );
+      } finally {
         setLoading(false);
-      }, 2000);
+      }
     }
   };
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          padding: 15,
-          alignItems: "center",
-          backgroundColor: "white",
-          elevation: 10,
-          borderRadius: 10,
-          marginHorizontal: 20,
-          width: "90%",
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 25, marginVertical: 15 }}>
-          Sign in to your account
-        </Text>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Sign in to your account</Text>
 
-        {/* Email Input */}
         <View
-          style={{
-            width: "100%",
-            height: 60,
-            padding: 15,
-            borderWidth: 0.5,
-            borderColor: emailError ? "red" : "lightgrey",
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-            flexDirection: "row",
-          }}
+          style={[
+            styles.inputContainer,
+            { borderColor: identifierError ? "red" : "lightgrey" },
+          ]}
         >
-          <MaterialCommunityIcons name="email-outline" size={24} color="grey" />
+          <MaterialCommunityIcons name="account" size={24} color="grey" />
           <TextInput
-            style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
-            placeholder="Email address"
-            onChangeText={(text) => setEmail(text)}
-            onBlur={() => validateEmail(email)}
+            style={styles.input}
+            placeholder="Email address or Phone number"
+            onChangeText={setIdentifier}
+            onBlur={() => validateIdentifier(identifier)}
             autoCapitalize="none"
-            value={email}
+            value={identifier}
           />
         </View>
-        {emailError ? <Text style={{ color: "red" }}>{emailError}</Text> : null}
+        {identifierError ? (
+          <Text style={styles.errorText}>{identifierError}</Text>
+        ) : null}
 
-        {/* Password Input */}
         <View
           style={{
             width: "100%",
             height: 60,
             padding: 15,
             borderWidth: 0.5,
-            borderColor: "lightgrey",
             borderBottomLeftRadius: 10,
             borderBottomRightRadius: 10,
             flexDirection: "row",
             alignItems: "center",
+            borderColor: "lightgrey",
           }}
         >
           <Fontisto name="locked" size={24} color="grey" />
           <TextInput
-            style={{ flex: 1, marginLeft: 10, fontSize: 16 }}
+            style={styles.input}
             placeholder="Password"
             secureTextEntry={!passwordVisible}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={setPassword}
             value={password}
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
@@ -123,44 +112,40 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <Text style={{ marginVertical: 20 }}>Forgot password?</Text>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("ResetPassword", { token: UserToken })
+          }
+        >
+          <Text
+            onPress={() => navigation.navigate("ForgotPassword")}
+            style={styles.forgotPassword}
+          >
+            Forgot password?
+          </Text>
+        </TouchableOpacity>
 
-        {/* Submit button */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           {loading ? (
             <ActivityIndicator size="small" color="#ffffff" />
           ) : (
-            <Text style={{ color: "white", fontSize: 16 }}>Login</Text>
+            <Text style={styles.loginButtonText}>Login</Text>
           )}
         </TouchableOpacity>
 
-        {/* title */}
         <View style={styles.continueWithContainer}>
           <View style={styles.separator} />
-          <Text style={{ marginVertical: 15, color: "grey" }}>
-            Or Continue with
-          </Text>
+          <Text style={styles.orContinueText}>Or Continue with</Text>
           <View style={styles.separator} />
         </View>
 
-        {/* Google & Apple buttons */}
         <View style={styles.authButtonsContainer}>
           <TouchableOpacity style={styles.authButton}>
-            <AntDesign
-              style={{ marginRight: 10 }}
-              name="apple1"
-              size={24}
-              color="black"
-            />
+            <AntDesign name="apple1" size={24} color="black" />
             <Text style={styles.authButtonText}>Apple</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.authButton}>
-            <AntDesign
-              style={{ marginRight: 10 }}
-              name="google"
-              size={24}
-              color="black"
-            />
+            <AntDesign name="google" size={24} color="black" />
             <Text style={styles.authButtonText}>Google</Text>
           </TouchableOpacity>
         </View>
@@ -168,7 +153,10 @@ const LoginScreen = () => {
 
       <View style={styles.footer}>
         <Text>Not a member?</Text>
-        <Text onPress={() => navigation.navigate("Register")}>
+        <Text
+          onPress={() => navigation.navigate("Register")}
+          style={styles.createAccountText}
+        >
           Create an account
         </Text>
       </View>
@@ -183,6 +171,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  formContainer: {
+    padding: 15,
+    alignItems: "center",
+    backgroundColor: "white",
+    elevation: 10,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    width: "90%",
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 25,
+    marginVertical: 15,
+  },
+  inputContainer: {
+    width: "100%",
+    height: 60,
+    padding: 15,
+    borderWidth: 0.5,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  input: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  errorText: {
+    color: "red",
+  },
+  forgotPassword: {
+    marginVertical: 20,
+    color: "blue",
+  },
   loginButton: {
     width: 200,
     height: 50,
@@ -192,6 +216,10 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loginButtonText: {
+    color: "white",
+    fontSize: 16,
   },
   continueWithContainer: {
     flexDirection: "row",
@@ -205,6 +233,11 @@ const styles = StyleSheet.create({
     width: 80,
     borderWidth: 0.5,
     borderColor: "lightgrey",
+    marginHorizontal: 15,
+  },
+  orContinueText: {
+    marginVertical: 15,
+    color: "grey",
   },
   authButtonsContainer: {
     flexDirection: "row",
@@ -223,8 +256,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   authButtonText: {
-    alignSelf: "center",
-    flex: 1,
+    marginLeft: 10,
     fontSize: 18,
   },
   footer: {
@@ -234,6 +266,9 @@ const styles = StyleSheet.create({
     padding: 15,
     flexDirection: "row",
     marginVertical: 20,
+  },
+  createAccountText: {
+    color: "blue",
   },
 });
 

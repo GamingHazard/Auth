@@ -11,6 +11,8 @@ import RegisterScreen from "./Screens/RegisterScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import WelcomeScreen from "./Screens/WelcomeScreen";
 import { AuthContext } from "./Screens/context/AuthContext";
+import ResetPasswordScreen from "./Screens/ChangePassword";
+import ForgotPasswordScreen from "./Screens/components/ForgotPasswordPage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,6 +24,8 @@ function AuthStack() {
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
   );
 }

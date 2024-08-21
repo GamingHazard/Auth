@@ -58,7 +58,6 @@ const RegisterScreen = ({ navigation }) => {
       register(username, email, phone, password);
       setTimeout(() => {
         setLoading(false);
-        alert("Account created successfully!");
       }, 2000);
     }
   };

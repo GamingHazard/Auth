@@ -42,28 +42,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Log in user
-  const login = (email, password) => {
-    setIsLoading(true);
-    axios
-      .post("https://demo-backend-85jo.onrender.com/login", {
-        email,
-        password,
-      })
-      .then((response) => {
-        let UserInfo = response.data;
+  const login = async (identifier, password) => {
+    try {
+      const response = await axios.post(
+        "https://demo-backend-85jo.onrender.com/login",
+        {
+          identifier,
+          password,
+        }
+      );
 
-        setUserInfo(UserInfo);
-        setUserToken(UserInfo.token);
-        setUserID(UserInfo.user.id);
+      let UserInfo = response.data;
 
-        AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
-        AsyncStorage.setItem("userToken", UserInfo.token);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      setUserInfo(UserInfo);
+      setUserToken(UserInfo.token);
+
+      await AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
+      await AsyncStorage.setItem("userToken", UserInfo.token);
+
+      return UserInfo; // Return the data if needed
+    } catch (error) {
+      // Throw the error to be caught in the component
+      throw error;
+    }
   };
-
   // Log out user
   const logout = () => {
     setIsLoading(true);
@@ -103,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const HideEditPage = async () => {
-    await AsyncStorage.removeItem("userImage");
+    // await AsyncStorage.removeItem("userImage");
     setMainModal(false);
   };
 
@@ -124,7 +126,10 @@ export const AuthProvider = ({ children }) => {
         const permissionResult =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
-          alert("Permission to access gallery is required!");
+          Alert.alert(
+            "Permission Required",
+            "Permission to access gallery is required!"
+          );
           return;
         }
         result = await ImagePicker.launchImageLibraryAsync({
@@ -137,7 +142,10 @@ export const AuthProvider = ({ children }) => {
         const permissionResult =
           await ImagePicker.requestCameraPermissionsAsync();
         if (!permissionResult.granted) {
-          alert("Permission to access camera is required!");
+          Alert.alert(
+            "Permission Required",
+            "Permission to access camera is required!"
+          );
           return;
         }
         result = await ImagePicker.launchCameraAsync({
@@ -148,21 +156,22 @@ export const AuthProvider = ({ children }) => {
         });
       }
 
-      if (!result.canceled) {
-        await saveImageToStorage(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        await saveImageToStorage(imageUri);
       }
     } catch (error) {
-      console.log("Error is caused by: " + error);
+      console.log("Error uploading image: ", error);
     }
   };
 
   // Storing image in AsyncStorage
   const saveImageToStorage = async (imageUri) => {
     try {
-      setSelectedImage(imageUri);
       await AsyncStorage.setItem("userImage", imageUri);
+      setSelectedImage(imageUri);
     } catch (error) {
-      console.log("Error saving image: " + error);
+      console.log("Error saving image: ", error);
     }
   };
 
@@ -172,15 +181,32 @@ export const AuthProvider = ({ children }) => {
       setSelectedImage(null);
       await AsyncStorage.removeItem("userImage");
     } catch (error) {
-      console.log("Error removing image: " + error);
+      console.log("Error removing image: ", error);
     }
   };
 
+  // Load image from storage on component mount
+  React.useEffect(() => {
+    const loadImageFromStorage = async () => {
+      try {
+        const imageUri = await AsyncStorage.getItem("userImage");
+        if (imageUri) {
+          setSelectedImage(imageUri);
+        }
+      } catch (error) {
+        console.log("Error loading image: ", error);
+      }
+    };
+
+    loadImageFromStorage();
+  }, []);
+
+  // updating user profile
   const updateUserProfile = async (username, email, phone) => {
     setIsLoading(true);
     try {
       // Update the user profile
-      await axios.patch(
+      const updateResponse = await axios.patch(
         "https://demo-backend-85jo.onrender.com/updateUser",
         { username, email, phone },
         {
@@ -189,6 +215,29 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
+
+      console.log("Update response:", updateResponse.data);
+
+      // Refetch the updated user profile
+      const fetchResponse = await axios.get(
+        `https://demo-backend-85jo.onrender.com/profile/${UserID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        }
+      );
+
+      console.log("Fetched user profile:", fetchResponse.data);
+
+      // Store the updated user profile in AsyncStorage
+      await AsyncStorage.setItem(
+        "userInfo",
+        JSON.stringify(fetchResponse.data)
+      );
+
+      // Update state with the refetched data
+      setUserInfo(fetchResponse.data); // Ensure this updates UserInfo
     } catch (error) {
       console.log(
         "Error updating or fetching profile:",

@@ -119,6 +119,30 @@ const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
+// Function to send reset password email
+const sendResetPasswordEmail = async (email, resetUrl) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: "company name",
+    to: email,
+    subject: "Password Reset Request",
+    text: `You are receiving this email because you (or someone else) have requested to reset the password for your account.\n\nPlease click on the following link, or paste it into your browser, to complete the process:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending reset password email", error);
+  }
+};
+
 app.get("/verify/:token", async (req, res) => {
   try {
     const token = req.params.token;
@@ -162,17 +186,25 @@ const authenticateToken = (req, res, next) => {
 // Endpoint to login users
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { identifier, password } = req.body;
+
+    // Find user by email or phone
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { phone: identifier }],
+    });
 
     if (!user) {
-      return res.status(404).json({ message: "Invalid email" });
+      return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the password matches
     if (user.password !== password) {
-      return res.status(404).json({ message: "Invalid password" });
+      return res
+        .status(401)
+        .json({ message: "wrong password,Check your password and try again" });
     }
 
+    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, secretKey, {
       expiresIn: "1h",
     });
@@ -191,7 +223,6 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed" });
   }
 });
-
 // Endpoint to get user profile
 app.get("/profile/:userId", authenticateToken, async (req, res) => {
   try {
@@ -260,5 +291,77 @@ app.delete("/deleteUser/:userId", authenticateToken, async (req, res) => {
     res
       .status(500)
       .json({ status: "error", message: "Failed to delete account" });
+  }
+});
+
+// Endpoint to request a password reset
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const { identifier } = req.body; // Accept either email or phone number
+
+    // Check if identifier is a valid email or phone number
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { phoneNumber: identifier }], // Search by email or phone number
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "No account found with this email address or phone number.",
+      });
+    }
+
+    // Generate a reset token and expiration
+    const token = crypto.randomBytes(20).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    await user.save();
+
+    // Send email with the token if email is provided
+    if (user.email) {
+      const resetUrl = `https://your-frontend-url/reset-password/${token}`;
+      await sendResetPasswordEmail(user.email, resetUrl);
+    }
+
+    // Respond with the token
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error("Error in /forgot-password", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Endpoint to reset password
+app.patch("/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // Find user with the provided token and check if it is still valid
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Password reset token is invalid or has expired." });
+    }
+
+    // Update the user's password and clear the reset token
+    user.password = password; // Note: Storing plaintext passwords is not secure
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    // Save the updated user
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Password has been updated successfully." });
+  } catch (error) {
+    console.error("Error in /reset-password/:token", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
