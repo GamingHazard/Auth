@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         setUserInfo(UserInfo);
         setUserToken(UserInfo.token);
         setUserID(UserInfo.user.id);
+        console.log(UserInfo.token);
 
         AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
         AsyncStorage.setItem("userToken", UserInfo.token);
@@ -172,38 +173,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Deleting user Account
-  const deleteUserAccount = async () => {
-    setIsLoading(true);
-    try {
-      const deleteResponse = await axios.delete(
-        `https://demo-backend-85jo.onrender.com/deleteUser/${UserID}`,
-        {
-          headers: {
-            Authorization: `Bearer ${UserToken}`,
-          },
-        }
-      );
-
-      // Check if the deletion was successful
-      if (deleteResponse.status === 200) {
-        // Clear AsyncStorage and update state
-        await AsyncStorage.removeItem("userInfo");
-        await AsyncStorage.removeItem("userToken");
-
-        // Log the user out
-        logout();
-      }
-    } catch (error) {
-      console.log(
-        "Error deleting user account:",
-        error.response ? error.response.data : error.message
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -220,7 +189,7 @@ export const AuthProvider = ({ children }) => {
         HideEditPage,
         MainModal,
         UserID,
-        deleteUserAccount,
+
         ShowDeleteModal,
         HideDeleteModal,
         deleteModal,

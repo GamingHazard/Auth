@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { AuthContext } from "./context/AuthContext";
 import ModalView from "./components/Modal";
@@ -22,7 +23,7 @@ const ProfileScreen = () => {
     UserInfo,
     UserID,
     UserToken,
-    deleteUserAccount,
+    //  deleteUserAccount,
     ShowDeleteModal,
     HideDeleteModal,
     deleteModal,
@@ -30,6 +31,7 @@ const ProfileScreen = () => {
 
   const [user, setUser] = useState(UserInfo?.user || {});
   const [error, setError] = useState(null);
+  const [loadingDelete, setLoadingDelete] = useState(false); // State for loading
 
   const userName = user.username || "Name of User";
   const userPhone = user.phone ? `+256 ${user.phone}` : "Phone not available";
@@ -61,12 +63,34 @@ const ProfileScreen = () => {
     }
   };
 
-  const DeleteModalShow = () => {
-    ShowDeleteModal();
+  // Deleting user Account
+  const deleteUserAccount = async () => {
+    setLoadingDelete(true); // Start loading
+    try {
+      const deleteResponse = await axios.delete(
+        `https://demo-backend-85jo.onrender.com/deleteUser/${UserID}`, // Include UserID in URL
+        {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        }
+      );
+
+      // Check if the deletion was successful
+      if (deleteResponse.status === 200) {
+        logout();
+      }
+    } catch (error) {
+      console.log(
+        "Error deleting user account:",
+        error.response ? error.response.data : error.message
+      );
+      setError("Failed to delete account.");
+    } finally {
+      setLoadingDelete(false); // Stop loading
+    }
   };
-  const DeleteModalHide = () => {
-    HideDeleteModal();
-  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -108,13 +132,13 @@ const ProfileScreen = () => {
             }}
           >
             <TouchableOpacity
-              onPress={ShowModal}
+              onPress={ShowEditPage}
               style={styles.editProfileButton}
             >
               <Text style={styles.editProfileText}>Edit Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={DeleteModalShow}
+              onPress={ShowDeleteModal}
               style={styles.editProfileButton}
             >
               <Text style={styles.editProfileText}>Delete Account</Text>
@@ -181,9 +205,9 @@ const ProfileScreen = () => {
                   marginTop: 20,
                 }}
               >
-                {/*  cancel Delete button */}
+                {/* Cancel Delete button */}
                 <TouchableOpacity
-                  onPress={DeleteModalHide}
+                  onPress={HideDeleteModal}
                   style={{
                     padding: 10,
                     justifyContent: "center",
@@ -198,15 +222,21 @@ const ProfileScreen = () => {
 
                 {/* Delete Button */}
                 <TouchableOpacity
+                  onPress={deleteUserAccount}
                   style={{
                     padding: 10,
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "red",
                     borderRadius: 20,
+                    flexDirection: "row",
                   }}
                 >
-                  <Text style={styles.editProfileText}>Delete Account</Text>
+                  {loadingDelete ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.editProfileText}>Delete Account</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
