@@ -5,6 +5,7 @@ import Nav, { AuthStack } from "./Navigation";
 import { AuthProvider } from "./Screens/context/AuthContext";
 import ModalView from "./Screens/components/Modal";
 import ResetPasswordScreen from "./Screens/ChangePassword";
+import RegistrationScreen from "./Screens/components/Demo";
 export default function App() {
   return (
     <AuthProvider>
@@ -12,6 +13,7 @@ export default function App() {
         <StatusBar hidden={true} />
         <Nav />
         {/* <ResetPasswordScreen /> */}
+        {/* <RegistrationScreen /> */}
       </View>
     </AuthProvider>
   );

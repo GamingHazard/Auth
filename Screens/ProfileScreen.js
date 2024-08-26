@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { AuthContext } from "./context/AuthContext";
 import ModalView from "./components/Modal";
@@ -23,80 +23,41 @@ const ProfileScreen = () => {
     UserInfo,
     UserID,
     UserToken,
-    //  deleteUserAccount,
     ShowDeleteModal,
     HideDeleteModal,
     deleteModal,
+    deleteUserAccount,
   } = useContext(AuthContext);
 
   const [user, setUser] = useState(UserInfo?.user || {});
   const [error, setError] = useState(null);
-  const [loadingDelete, setLoadingDelete] = useState(false); // State for loading
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const userName = user.username || "Name of User";
+  // Update user state when UserInfo changes
+  useEffect(() => {
+    if (UserInfo?.user) {
+      setUser(UserInfo.user);
+    }
+  }, [UserInfo]);
+
+  const userName = user.name || "Name of User";
   const userPhone = user.phone ? `+256 ${user.phone}` : "Phone not available";
   const userEmail = user.email || "Email not available";
 
-  const HideModal = async () => {
-    try {
-      HideEditPage();
-
-      const profileResponse = await axios.get(
-        `https://demo-backend-85jo.onrender.com/profile/${UserID}`,
-        {
-          headers: {
-            Authorization: `Bearer ${UserToken}`,
-            "Cache-Control": "no-cache",
-          },
-        }
-      );
-
-      const updatedUserInfo = profileResponse.data.user;
-      setUser(updatedUserInfo); // Update the user state with the latest data
-    } catch (err) {
-      setError("Failed to fetch updated user data.");
-      console.error(err);
-    }
-  };
-
-  // Deleting user Account
-  const deleteUserAccount = async () => {
-    setLoadingDelete(true); // Start loading
-    try {
-      const deleteResponse = await axios.delete(
-        `https://demo-backend-85jo.onrender.com/deleteUser/${UserID}`, // Include UserID in URL
-        {
-          headers: {
-            Authorization: `Bearer ${UserToken}`,
-          },
-        }
-      );
-
-      // Check if the deletion was successful
-      if (deleteResponse.status === 200) {
-        logout();
-      }
-    } catch (error) {
-      console.log(
-        "Error deleting user account:",
-        error.response ? error.response.data : error.message
-      );
-      setError("Failed to delete account.");
-    } finally {
-      setLoadingDelete(false); // Stop loading
-    }
+  const Delete = async () => {
+    setLoadingDelete(true);
+    deleteUserAccount();
+    setLoadingDelete(false);
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
       </View>
       <ScrollView style={{ flex: 1 }}>
-        {/* Profile pic */}
         <View style={styles.profileContainer}>
           <View style={styles.profilePicContainer}>
             <Image
@@ -150,16 +111,17 @@ const ProfileScreen = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Edit Modal View */}
         <ModalView
-          HideModal={HideModal}
+          HideModal={HideEditPage}
           content={
-            <ProfileEditScreen SaveProfile={HideModal} cancel={HideModal} />
+            <ProfileEditScreen
+              FetchProfileUpdate={HideEditPage}
+              cancel={HideEditPage}
+            />
           }
           modalVisible={MainModal}
         />
-
-        {/* Delete Account Modal */}
+        {/* account deleting Modal */}
         <ModalView
           content={
             <View
@@ -201,7 +163,6 @@ const ProfileScreen = () => {
                   marginTop: 20,
                 }}
               >
-                {/* Cancel Delete button */}
                 <TouchableOpacity
                   onPress={HideDeleteModal}
                   style={{
@@ -216,9 +177,8 @@ const ProfileScreen = () => {
                   <Text style={styles.editProfileText}>Cancel</Text>
                 </TouchableOpacity>
 
-                {/* Delete Button */}
                 <TouchableOpacity
-                  onPress={deleteUserAccount}
+                  onPress={Delete}
                   style={{
                     padding: 10,
                     justifyContent: "center",

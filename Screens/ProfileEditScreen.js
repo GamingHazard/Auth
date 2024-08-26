@@ -16,7 +16,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AuthContext } from "./context/AuthContext";
 
-const ProfileEditScreen = ({ cancel, SaveProfile }) => {
+const ProfileEditScreen = ({ cancel, FetchProfileUpdate }) => {
   const {
     uploadImage,
     removeImage,
@@ -26,7 +26,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   } = useContext(AuthContext);
 
   // State for form inputs
-  const [username, setUsername] = useState(UserInfo.user.username);
+  const [name, setName] = useState(UserInfo.user.name);
   const [email, setEmail] = useState(UserInfo.user.email);
   const [phone, setPhone] = useState(UserInfo.user.phone);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +40,16 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
   };
 
   const handleUpdateProfile = async () => {
+    // Basic validation (you can improve this)
+    if (!name || !email || !phone) {
+      alert("Please fill all fields");
+      return;
+    }
     setIsLoading(true);
     try {
-      await updateUserProfile(username, email, phone);
-      SaveProfile();
+      await updateUserProfile(name, email, phone);
+      // SaveProfile();
+      FetchProfileUpdate();
     } catch (error) {
       console.log(error);
     } finally {
@@ -138,8 +144,9 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
           <TextInput
             style={styles.input}
             placeholder="Enter your name"
-            value={username}
-            onChangeText={(text) => setUsername(text)}
+            value={name}
+            onChangeText={(text) => setName(text)}
+            keyboardType="default"
           />
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -147,6 +154,7 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
             placeholder="Enter your email"
             value={email}
             onChangeText={(text) => setEmail(text)}
+            keyboardType="email-address"
           />
           <Text style={styles.label}>Tel Number</Text>
           <TextInput
@@ -154,12 +162,15 @@ const ProfileEditScreen = ({ cancel, SaveProfile }) => {
             placeholder="Enter your phone number"
             value={phone}
             onChangeText={(text) => setPhone(text)}
+            keyboardType="phone-pad"
           />
+          {/* Password - Consider removing or managing state if needed */}
           <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
             secureTextEntry={true}
             placeholder="Enter your password"
+            keyboardType="default"
           />
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={cancel} style={styles.button}>
@@ -189,7 +200,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
-    // marginVertical: 20,
     borderRadius: 15,
   },
   header: {
@@ -206,11 +216,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    width: "50%",
+    width: "80%",
   },
   profilePicContainer: {
     alignItems: "center",
-    width: "60%",
+    width: "100%",
     height: 230,
     paddingTop: 30,
     justifyContent: "center",
@@ -246,78 +256,62 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   modalContent: {
-    width: 280,
+    width: 400,
     height: "auto",
     backgroundColor: "white",
-    padding: 10,
+    // padding: 10,
     borderRadius: 10,
   },
   modalCloseIcon: {
     alignSelf: "flex-end",
-    marginBottom: 15,
   },
   modalOptions: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
+    justifyContent: "space-around",
+    paddingVertical: 20,
   },
   modalOption: {
-    padding: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f2f5fc",
-    borderRadius: 10,
   },
   line: {
-    height: 0.5,
-    width: "100%",
-    borderWidth: 0.5,
-    borderColor: "whitesmoke",
-    left: 20,
-    right: 20,
+    borderBottomWidth: 1,
+    borderColor: "#e4e4e6",
+    marginVertical: 10,
   },
   inputContainer: {
-    width: 400,
-    height: "auto",
-    padding: 10,
+    width: 280,
   },
   label: {
-    fontWeight: "bold",
-    fontSize: 18,
-    left: 30,
+    fontSize: 16,
+    color: "#333",
+    marginVertical: 5,
   },
   input: {
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#d4d4d4",
+    marginBottom: 15,
     width: "100%",
-    padding: 10,
-    marginBottom: 16,
-    borderRadius: 40,
-    backgroundColor: "#f2f5fc",
-    marginTop: 5,
-    alignSelf: "center",
-    paddingLeft: 20,
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    padding: 10,
-    width: "100%",
-    alignSelf: "center",
-    top: -15,
+    justifyContent: "space-between",
   },
   button: {
-    alignItems: "center",
     backgroundColor: "#3061e4",
-    alignSelf: "center",
-    marginVertical: 30,
-    borderRadius: 40,
-    padding: 10,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 40,
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     color: "white",
+    fontSize: 16,
     fontWeight: "bold",
-    fontSize: 18,
   },
 });
 

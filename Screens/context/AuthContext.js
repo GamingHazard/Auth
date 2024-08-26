@@ -15,37 +15,57 @@ export const AuthProvider = ({ children }) => {
   const [deleteModal, setdeleteModal] = useState(false);
 
   // Register new user
-  const register = (username, email, phone, password) => {
+  const register = async (name, email, phone, password) => {
     setIsLoading(true);
-    axios
-      .post("https://demo-backend-85jo.onrender.com/register", {
-        username,
-        email,
-        phone,
-        password,
-      })
-      .then((response) => {
-        let UserInfo = response.data;
-        // console.log(response.data);
+    try {
+      const response = await axios.post(
+        "https://auth-db-23ly.onrender.com/register",
+        {
+          name,
+          email,
+          phone,
+          password,
+        }
+      );
 
-        setUserInfo(UserInfo);
-        setUserToken(UserInfo.token);
-        setUserID(UserInfo.user.id);
-        // console.log(UserInfo.token);
+      let UserInfo = response.data;
+      console.log("Registration Response:", UserInfo);
 
-        AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
-        AsyncStorage.setItem("userToken", UserInfo.token);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      // Check if the registration was successful
+      if (response.status === 201 || response.status === 200) {
+        // Ensure the token and ID are available
+        const { token, id } = UserInfo.user;
+        if (token && id) {
+          setUserInfo(UserInfo);
+          setUserToken(token);
+          setUserID(id);
+          console.log("User Token:", token);
+
+          // Store the user information and token in AsyncStorage
+          await AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
+          await AsyncStorage.setItem("userToken", token);
+          await AsyncStorage.setItem("userId", id);
+        } else {
+          console.log("Token or ID missing in response.");
+        }
+      } else {
+        console.log("Registration failed:", response.data.message);
+      }
+    } catch (error) {
+      console.error(
+        "Error registering user:",
+        error.response?.data?.message || error.message
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Log in user
   const login = async (identifier, password) => {
     try {
       const response = await axios.post(
-        "https://demo-backend-85jo.onrender.com/login",
+        "https://auth-db-23ly.onrender.com/login",
         {
           identifier,
           password,
@@ -57,9 +77,12 @@ export const AuthProvider = ({ children }) => {
       setUserInfo(UserInfo);
       setUserToken(UserInfo.token);
       setUserID(UserInfo.user.id);
+      console.log(UserInfo.user.id);
+      console.log("user token is : ", UserInfo.token);
 
       await AsyncStorage.setItem("userInfo", JSON.stringify(UserInfo));
       await AsyncStorage.setItem("userToken", UserInfo.token);
+      AsyncStorage.setItem("userId", UserInfo.user.id);
 
       return UserInfo; // Return the data if needed
     } catch (error) {
@@ -75,6 +98,8 @@ export const AuthProvider = ({ children }) => {
     setUserID(null);
     AsyncStorage.removeItem("userInfo");
     AsyncStorage.removeItem("userToken");
+    AsyncStorage.removeItem("userId");
+    AsyncStorage.removeItem("userImage");
     setIsLoading(false);
   };
 
@@ -203,23 +228,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // updating user profile
-  const updateUserProfile = async (username, email, phone) => {
-    setIsLoading(true);
+
+  // Function to handle user profile update
+  const updateUserProfile = async (name, email, phone) => {
     try {
-      // Check if UserToken and UserID are available
+      // Ensure UserToken and UserID are available
       if (!UserToken || !UserID) {
         throw new Error("UserToken or UserID is missing.");
       }
 
       // Prepare the data to be updated
       const updateData = {};
-      if (username) updateData.username = username;
+      if (name) updateData.name = name;
       if (email) updateData.email = email;
       if (phone) updateData.phone = phone;
 
-      // Update the user profile
+      // Send PATCH request to update the user profile
       const updateResponse = await axios.patch(
-        "https://demo-backend-85jo.onrender.com/updateUser",
+        `https://auth-db-23ly.onrender.com/updateUser/${UserID}`,
         updateData,
         {
           headers: {
@@ -230,9 +256,25 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Update response:", updateResponse.data);
 
-      // Refetch the updated user profile
-      const fetchResponse = await axios.get(
-        `https://demo-backend-85jo.onrender.com/profile/${UserID}`,
+      // Store the updated user profile in AsyncStorage
+      await AsyncStorage.setItem(
+        "userInfo",
+        JSON.stringify(updateResponse.data)
+      );
+      // Update state with the refetched data
+      setUserInfo(updateResponse.data); // Ensure this updates UserInfo
+    } catch (error) {
+      console.error(error.response ? error.response.data : error.message);
+    } finally {
+      // Stop loading indicator
+    }
+  };
+
+  // Deleting Users Account
+  const deleteUserAccount = async () => {
+    try {
+      const deleteResponse = await axios.delete(
+        `https://auth-db-23ly.onrender.com/deleteUser/${UserID}`, // Include UserID in URL
         {
           headers: {
             Authorization: `Bearer ${UserToken}`,
@@ -240,23 +282,17 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      console.log("Fetched user profile:", fetchResponse.data);
-
-      // Store the updated user profile in AsyncStorage
-      await AsyncStorage.setItem(
-        "userInfo",
-        JSON.stringify(fetchResponse.data)
-      );
-
-      // Update state with the refetched data
-      setUserInfo(fetchResponse.data); // Ensure this updates UserInfo
+      // Check if the deletion was successful
+      if (deleteResponse.status === 200) {
+        logout();
+      }
     } catch (error) {
       console.log(
-        "Error updating or fetching profile:",
+        "Error deleting user account:",
         error.response ? error.response.data : error.message
       );
+      setError("Failed to delete account.");
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -280,6 +316,7 @@ export const AuthProvider = ({ children }) => {
         ShowDeleteModal,
         HideDeleteModal,
         deleteModal,
+        deleteUserAccount,
       }}
     >
       {children}

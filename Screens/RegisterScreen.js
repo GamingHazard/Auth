@@ -17,7 +17,7 @@ import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
 
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUserName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -53,9 +53,9 @@ const RegisterScreen = ({ navigation }) => {
     validateEmail(email);
     validatePhone(phone);
 
-    if (!emailError && !phoneError && username && password) {
+    if (!emailError && !phoneError && name && password) {
       setLoading(true);
-      register(username, email, phone, password);
+      register(name, email, phone, password);
       setTimeout(() => {
         setLoading(false);
       }, 2000);
@@ -79,7 +79,7 @@ const RegisterScreen = ({ navigation }) => {
           Create an account
         </Text>
 
-        {/* username Input */}
+        {/* name Input */}
         <View
           style={{
             width: "100%",
@@ -93,12 +93,12 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <AntDesign username="user" size={24} color="grey" />
+          <AntDesign name="user" size={24} color="grey" />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="User userName"
-            onChangeText={setUserName}
-            value={username}
+            onChangeText={setName}
+            value={name}
           />
         </View>
 
@@ -114,11 +114,7 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <MaterialCommunityIcons
-            username="email-outline"
-            size={24}
-            color="grey"
-          />
+          <MaterialCommunityIcons name="email-outline" size={24} color="grey" />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="Email address"
@@ -142,7 +138,7 @@ const RegisterScreen = ({ navigation }) => {
             marginBottom: 10,
           }}
         >
-          <Feather username="phone" size={24} color="grey" />
+          <Feather name="phone" size={24} color="grey" />
           <TextInput
             style={{ width: "100%", marginLeft: 10, fontSize: 16 }}
             placeholder="Tel number (+256)"
@@ -168,7 +164,7 @@ const RegisterScreen = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Fontisto username="locked" size={24} color="grey" />
+          <Fontisto name="locked" size={24} color="grey" />
           <TextInput
             style={{ flex: 1, marginLeft: 10, fontSize: 16 }}
             placeholder="Password"
@@ -178,7 +174,7 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
             <Ionicons
-              username={passwordVisible ? "eye-off" : "eye"}
+              name={passwordVisible ? "eye-off" : "eye"}
               size={24}
               color="grey"
             />
@@ -275,7 +271,7 @@ const RegisterScreen = ({ navigation }) => {
           >
             <AntDesign
               style={{ marginRight: 10 }}
-              username="apple1"
+              name="apple1"
               size={24}
               color="black"
             />
@@ -298,7 +294,7 @@ const RegisterScreen = ({ navigation }) => {
           >
             <AntDesign
               style={{ marginRight: 10 }}
-              username="google"
+              name="google"
               size={24}
               color="black"
             />
