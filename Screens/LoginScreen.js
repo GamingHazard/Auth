@@ -7,14 +7,13 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "./context/AuthContext";
-
+import { AuthContext } from "../context/AuthContext";
 const LoginScreen = ({ navigation }) => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -48,8 +47,9 @@ const LoginScreen = ({ navigation }) => {
         await login(identifier, password);
       } catch (error) {
         Alert.alert(
-          "Login Error",
-          error.response?.data?.message || "An error occurred."
+          "Login failed",
+          error.response?.data?.message ||
+            "check your internet connection and try again"
         );
       } finally {
         setLoading(false);
@@ -59,106 +59,14 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign in to your account</Text>
-
-        <View
-          style={[
-            styles.inputContainer,
-            { borderColor: identifierError ? "red" : "lightgrey" },
-          ]}
-        >
-          <MaterialCommunityIcons name="account" size={24} color="grey" />
-          <TextInput
-            style={styles.input}
-            placeholder="Email address or Phone number"
-            onChangeText={setIdentifier}
-            onBlur={() => validateIdentifier(identifier)}
-            autoCapitalize="none"
-            value={identifier}
-          />
-        </View>
-        {identifierError ? (
-          <Text style={styles.errorText}>{identifierError}</Text>
-        ) : null}
-
-        <View
-          style={{
-            width: "100%",
-            height: 60,
-            padding: 15,
-            borderWidth: 0.5,
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            borderColor: "lightgrey",
-          }}
-        >
-          <Fontisto name="locked" size={24} color="grey" />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={!passwordVisible}
-            onChangeText={setPassword}
-            value={password}
-          />
-          <TouchableOpacity onPress={togglePasswordVisibility}>
-            <Ionicons
-              name={passwordVisible ? "eye-off" : "eye"}
-              size={24}
-              color="grey"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ResetPassword", { token: UserToken })
-          }
-        >
-          <Text
-            onPress={() => navigation.navigate("ForgotPassword")}
-            style={styles.forgotPassword}
-          >
-            Forgot password?
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          {loading ? (
-            <ActivityIndicator size="small" color="#ffffff" />
-          ) : (
-            <Text style={styles.loginButtonText}>Login</Text>
-          )}
-        </TouchableOpacity>
-
-        <View style={styles.continueWithContainer}>
-          <View style={styles.separator} />
-          <Text style={styles.orContinueText}>Or Continue with</Text>
-          <View style={styles.separator} />
-        </View>
-
-        <View style={styles.authButtonsContainer}>
-          <TouchableOpacity style={styles.authButton}>
-            <AntDesign name="apple1" size={24} color="black" />
-            <Text style={styles.authButtonText}>Apple</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.authButton}>
-            <AntDesign name="google" size={24} color="black" />
-            <Text style={styles.authButtonText}>Google</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.footer}>
-        <Text>Not a member?</Text>
-        <Text
-          onPress={() => navigation.navigate("Register")}
-          style={styles.createAccountText}
-        >
-          Create an account
-        </Text>
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ color: "#fbfbda", top: 60 }}>Developed by JOEL</Text>
       </View>
     </View>
   );
@@ -167,7 +75,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "whitesmoke",
+    backgroundColor: "#3b6d3b",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -184,6 +92,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 25,
     marginVertical: 15,
+    color: "#3b6d3b",
   },
   inputContainer: {
     width: "100%",
@@ -194,6 +103,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "whitesmoke",
   },
   input: {
     flex: 1,
@@ -211,14 +121,14 @@ const styles = StyleSheet.create({
     width: 200,
     height: 50,
     borderRadius: 30,
-    backgroundColor: "black",
+    backgroundColor: "#3b6d3b",
     marginVertical: 10,
     padding: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   loginButtonText: {
-    color: "white",
+    color: "#fbfbda",
     fontSize: 16,
   },
   continueWithContainer: {

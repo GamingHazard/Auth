@@ -46,7 +46,7 @@ const ProfileScreen = () => {
 
   const Delete = async () => {
     setLoadingDelete(true);
-    deleteUserAccount();
+    await deleteUserAccount();
     setLoadingDelete(false);
   };
 

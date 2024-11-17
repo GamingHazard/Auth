@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   modalContent: {
-    width: 400,
+    width: 370,
     height: "auto",
     backgroundColor: "white",
-    // padding: 10,
+    padding: 10,
     borderRadius: 10,
   },
   modalCloseIcon: {

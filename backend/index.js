@@ -6,11 +6,17 @@ const bcrypt = require("bcrypt"); // Import bcrypt
 const nodemailer = require("nodemailer");
 const ws = require("ws");
 require("dotenv").config();
-
+const multer = require("multer");
+const cloudinary = require("./cloudinary");
+const streamifier = require("streamifier");
 const app = express();
 const port = 3000;
 const cors = require("cors");
 app.use(cors());
+
+// Set up multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -53,7 +59,6 @@ wss.on("connection", (ws) => {
 const User = require("./models/user");
 
 // Endpoint to register a user
-
 app.post("/register", async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
@@ -244,8 +249,9 @@ app.delete("/deleteUser/:userId", async (req, res) => {
 });
 
 // PATCH endpoint to update user info
+// PATCH endpoint to update user info
 app.patch("/updateUser/:userId", async (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, email, phone, profilePicture } = req.body;
   const userId = req.params.userId;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -279,6 +285,7 @@ app.patch("/updateUser/:userId", async (req, res) => {
     if (name) updateFields.name = name;
     if (email) updateFields.email = email;
     if (phone) updateFields.phone = phone;
+    if (profilePicture) updateFields.profilePicture = profilePicture;
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
       new: true,
@@ -366,5 +373,36 @@ app.patch("/reset-password/:token", async (req, res) => {
   } catch (error) {
     console.error("Error in /reset-password/:token", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Endpoint to upload images
+app.patch("/profile-images/:userId", authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { imageUrl } = req.body;
+
+    // Validate the user ID
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // Update the user profile with the new image URL
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePicture: imageUrl },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User image updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating user image", error);
+    res.status(500).json({ error: "Failed to update user image" });
   }
 });
